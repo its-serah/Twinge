@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.DS_Store
+.env
+.env.*
+.agents/
+.codex/
+npm-debug.log*

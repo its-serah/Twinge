@@ -1,0 +1,10 @@
+{
+  "name": "twinge.",
+  "short_name": "twinge",
+  "description": "feel it. track it. understand it.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f7f4ed",
+  "theme_color": "#f7f4ed",
+  "icons": []
+}
