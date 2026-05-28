@@ -1,0 +1,22 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: twinge-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: twinge
+      POSTGRES_USER: twinge
+      POSTGRES_PASSWORD: twinge_dev_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - twinge-postgres-data:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U twinge -d twinge"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  twinge-postgres-data:

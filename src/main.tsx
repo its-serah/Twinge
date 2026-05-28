@@ -5,6 +5,7 @@ import {
   Apple,
   BarChart3,
   Brain,
+  CheckCircle2,
   Dumbbell,
   Droplets,
   Download,
@@ -15,6 +16,7 @@ import {
   Footprints,
   Sparkles,
   Trash2,
+  Wand2,
 } from "lucide-react";
 import {
   Bar,
@@ -38,6 +40,7 @@ const locations = ["Shin", "Shank / Calf", "Knee", "Ankle", "Thigh", "Hip", "Bac
 const intensities: Intensity[] = ["Low", "Medium", "High"];
 const goals: HealthGoal[] = ["Lose weight", "Maintain", "Gain muscle", "Improve energy"];
 const starterFoods = ["Eggs", "Greek yogurt", "Banana", "Oats", "Chicken rice bowl", "Salmon", "Avocado toast", "Protein shake"];
+const navItems = ["Dashboard", "Food", "Gym", "Symptoms", "Check-in", "Profile"];
 const commonFoods: FoodItem[] = [
   { id: "common_apple", name: "Apple", calories: 95, protein: 0, fiber: 4, timesLogged: 0 },
   { id: "common_eggs", name: "Eggs", calories: 140, protein: 12, fiber: 0, timesLogged: 0 },
@@ -60,6 +63,7 @@ function App() {
     protein: todayFoods.reduce((sum, item) => sum + item.protein, 0),
     fiber: todayFoods.reduce((sum, item) => sum + item.fiber, 0),
   };
+  const waterGlasses = Math.round(todayWaterMl / 250);
 
   const trends = useMemo(() => {
     return lastDays(7).map((date) => {
@@ -91,10 +95,10 @@ function App() {
             <span>feel it. track it.</span>
           </div>
         </div>
-        {["Dashboard", "Food", "Gym", "Symptoms", "Check-in", "Profile"].map((item) => (
+        {navItems.map((item) => (
           <button className={active === item ? "nav active" : "nav"} key={item} onClick={() => setActive(item)}>
             {navIcon(item)}
-            {item}
+            <span>{item}</span>
           </button>
         ))}
       </aside>
@@ -102,12 +106,16 @@ function App() {
       <main>
         <header className="topbar">
           <div>
-            <p className="eyebrow">Today</p>
+            <p className="eyebrow">{new Date().toLocaleDateString(undefined, { weekday: "long", month: "short", day: "numeric" })}</p>
             <h1>{active === "Dashboard" ? `Hi ${data.profile.name || "there"}, here's your body board.` : active}</h1>
           </div>
-          <button className="button ghost" onClick={() => exportJson(data)}>
-            <Download size={17} /> Export JSON
-          </button>
+          <div className="top-actions">
+            <span className="status-pill"><Flame size={15} /> {totals.calories}/{data.profile.calorieGoal}</span>
+            <span className="status-pill"><Droplets size={15} /> {waterGlasses}/{data.profile.waterGoal}</span>
+            <button className="button ghost" onClick={() => exportJson(data)}>
+              <Download size={17} /> Export
+            </button>
+          </div>
         </header>
 
         {active === "Dashboard" && (
@@ -146,9 +154,44 @@ function Dashboard(props: {
   const waterGlasses = Math.round(todayWaterMl / 250);
   const symptoms = data.symptomLogs.filter((log) => log.loggedAt.startsWith(todayKey()));
   const streak = lastDays(7).filter((date) => (data.stepLogs.find((log) => log.date === date)?.stepCount ?? 0) >= data.profile.stepGoal).length;
+  const readiness = Math.round((((todayMental?.mood ?? 5) + (todayMental?.energy ?? 5)) / 20) * 100);
+  const journey = [
+    { label: "Check in", detail: todayMental ? `${todayMental.mood}/10 mood` : "Mood, energy, sleep", done: Boolean(todayMental), action: "Check-in", icon: <Brain size={18} /> },
+    { label: "Fuel", detail: `${totals.calories} kcal logged`, done: totals.calories > 0, action: "Food", icon: <Apple size={18} /> },
+    { label: "Hydrate", detail: `${waterGlasses}/${data.profile.waterGoal} glasses`, done: waterGlasses >= data.profile.waterGoal, action: "Dashboard", icon: <Droplets size={18} /> },
+    { label: "Move", detail: `${todaySteps.toLocaleString()} steps`, done: todaySteps >= data.profile.stepGoal, action: "Gym", icon: <Footprints size={18} /> },
+  ];
 
   return (
     <section className="stack">
+      <div className="hero-panel">
+        <div className="hero-copy">
+          <p className="eyebrow">Your gentle health loop</p>
+          <h2>{readiness}% glow score</h2>
+          <p>Start with a check-in, log what matters, then watch your daily rhythm come together.</p>
+          <div className="hero-tags">
+            <span>{totals.protein}g protein</span>
+            <span>{totals.fiber}g fiber</span>
+            <span>{symptoms.length} symptoms</span>
+          </div>
+        </div>
+        <div className="readiness-dial" style={{ ["--score" as string]: `${readiness}%` }}>
+          <strong>{moodEmoji(todayMental?.mood ?? 5)}</strong>
+          <span>{todayMental?.sleepHours ?? 0}h sleep</span>
+        </div>
+      </div>
+
+      <div className="journey">
+        {journey.map((step, index) => (
+          <button key={step.label} className={step.done ? "journey-step done" : "journey-step"} onClick={() => step.action === "Dashboard" ? props.addWater(250) : props.setActive(step.action)}>
+            <span className="journey-number">{step.done ? <CheckCircle2 size={18} /> : index + 1}</span>
+            <span className="journey-icon">{step.icon}</span>
+            <strong>{step.label}</strong>
+            <small>{step.detail}</small>
+          </button>
+        ))}
+      </div>
+
       <div className="metrics">
         <Metric icon={<Flame />} label="Calories" value={`${totals.calories}`} detail={`${data.profile.calorieGoal} kcal goal`} progress={totals.calories / data.profile.calorieGoal} />
         <Metric icon={<Footprints />} label="Steps" value={todaySteps.toLocaleString()} detail={`${streak} goal days this week`} progress={todaySteps / data.profile.stepGoal} />
@@ -160,7 +203,7 @@ function Dashboard(props: {
         <button onClick={() => props.setActive("Food")}><Apple size={18} /> Food</button>
         <button onClick={() => props.addWater(250)}><Droplets size={18} /> +250ml</button>
         <button onClick={() => props.setActive("Gym")}><Dumbbell size={18} /> Workout</button>
-        <button onClick={() => props.setActive("Symptoms")}><Activity size={18} /> Symptom</button>
+        <button onClick={() => props.setActive("Symptoms")}><Wand2 size={18} /> Symptom</button>
       </div>
 
       <div className="grid two">

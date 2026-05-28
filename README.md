@@ -11,6 +11,20 @@ npm run dev
 
 Open `http://localhost:5173/`.
 
+## Local Postgres
+
+```bash
+docker compose up -d
+```
+
+Connection string:
+
+```text
+postgresql://twinge:twinge_dev_password@localhost:5432/twinge
+```
+
+The schema and demo seed data live in `db/init`. The frontend still uses browser `localStorage`; this database is ready for the next pass when the app gets wired to a backend/API.
+
 ## Current build
 
 - React + Vite app shell
