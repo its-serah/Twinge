@@ -3,9 +3,11 @@ import { createRoot } from "react-dom/client";
 import {
   Activity,
   Apple,
+  ArrowRight,
   BarChart3,
   Brain,
   CheckCircle2,
+  Clock,
   Dumbbell,
   Droplets,
   Download,
@@ -16,6 +18,7 @@ import {
   Footprints,
   Sparkles,
   Trash2,
+  Utensils,
   Wand2,
 } from "lucide-react";
 import {
@@ -40,7 +43,7 @@ const locations = ["Shin", "Shank / Calf", "Knee", "Ankle", "Thigh", "Hip", "Bac
 const intensities: Intensity[] = ["Low", "Medium", "High"];
 const goals: HealthGoal[] = ["Lose weight", "Maintain", "Gain muscle", "Improve energy"];
 const starterFoods = ["Eggs", "Greek yogurt", "Banana", "Oats", "Chicken rice bowl", "Salmon", "Avocado toast", "Protein shake"];
-const navItems = ["Dashboard", "Food", "Gym", "Symptoms", "Check-in", "Profile"];
+const navItems = ["Today", "Dashboard", "Food", "Gym", "Symptoms", "Check-in", "Profile"];
 const commonFoods: FoodItem[] = [
   { id: "common_apple", name: "Apple", calories: 95, protein: 0, fiber: 4, timesLogged: 0 },
   { id: "common_eggs", name: "Eggs", calories: 140, protein: 12, fiber: 0, timesLogged: 0 },
@@ -49,7 +52,8 @@ const commonFoods: FoodItem[] = [
 
 function App() {
   const [data, setData] = useState<AppData>(() => loadData());
-  const [active, setActive] = useState("Dashboard");
+  const [active, setActive] = useState("Today");
+  const [entered, setEntered] = useState(false);
 
   useEffect(() => saveData(data), [data]);
 
@@ -85,6 +89,10 @@ function App() {
     setData((current) => ({ ...current, profile: { ...current.profile, ...patch } }));
   };
 
+  if (!entered) {
+    return <LandingPage onEnter={() => setEntered(true)} />;
+  }
+
   return (
     <div className="app">
       <aside className="sidebar">
@@ -107,7 +115,7 @@ function App() {
         <header className="topbar">
           <div>
             <p className="eyebrow">{new Date().toLocaleDateString(undefined, { weekday: "long", month: "short", day: "numeric" })}</p>
-            <h1>{active === "Dashboard" ? `Hi ${data.profile.name || "there"}, here's your body board.` : active}</h1>
+            <h1>{active === "Today" ? `Hey ${data.profile.name || "Sarah"}, what are we eating?` : active === "Dashboard" ? `Hi ${data.profile.name || "there"}, here's your body board.` : active}</h1>
           </div>
           <div className="top-actions">
             <span className="status-pill"><Flame size={15} /> {totals.calories}/{data.profile.calorieGoal}</span>
@@ -118,6 +126,7 @@ function App() {
           </div>
         </header>
 
+        {active === "Today" && <TodayPage data={data} setData={setData} setActive={setActive} />}
         {active === "Dashboard" && (
           <Dashboard
             data={data}
@@ -137,6 +146,109 @@ function App() {
         {active === "Profile" && <ProfilePage data={data} setData={setData} setProfile={setProfile} />}
       </main>
     </div>
+  );
+}
+
+
+function LandingPage({ onEnter }: { onEnter: () => void }) {
+  return (
+    <main className="landing">
+      <section className="landing-card">
+        <div className="landing-mark"><HeartPulse size={30} /></div>
+        <p className="eyebrow">feel it. track it. understand it.</p>
+        <h1>twinge.</h1>
+        <p className="landing-copy">A soft little home for food, water, workouts, symptoms, mood, and the patterns your body keeps trying to tell you.</p>
+        <div className="landing-actions">
+          <button className="button landing-button" onClick={onEnter}>Sign up <ArrowRight size={18} /></button>
+          <button className="button ghost landing-button" onClick={onEnter}>Continue <ArrowRight size={18} /></button>
+        </div>
+      </section>
+    </main>
+  );
+}
+
+function TodayPage({ data, setData, setActive }: { data: AppData; setData: React.Dispatch<React.SetStateAction<AppData>>; setActive: (tab: string) => void }) {
+  const suggestedMeal = mealForNow();
+  const lastFood = data.foodLogs.slice().reverse()[0];
+  const [meal, setMeal] = useState<MealTag>((lastFood?.mealTag ?? suggestedMeal) as MealTag);
+  const [query, setQuery] = useState("");
+  const [manual, setManual] = useState({ calories: 0, protein: 0, fiber: 0 });
+  const matches = [...data.foodLibrary, ...commonFoods].filter((food) => food.name.toLowerCase().includes(query.toLowerCase()) && query.trim());
+  const frequentFoods = data.foodLibrary.slice().sort((a, b) => b.timesLogged - a.timesLogged).slice(0, 6);
+
+  const logFood = (food: FoodItem) => {
+    setData((current) => {
+      const library = current.foodLibrary.some((item) => item.name.toLowerCase() === food.name.toLowerCase())
+        ? current.foodLibrary.map((item) => item.name.toLowerCase() === food.name.toLowerCase() ? { ...item, timesLogged: item.timesLogged + 1 } : item)
+        : [...current.foodLibrary, { ...food, id: uid("food"), timesLogged: 1 }];
+
+      return {
+        ...current,
+        foodLibrary: library,
+        foodLogs: [...current.foodLogs, { ...food, id: uid("log"), mealTag: meal, loggedAt: new Date().toISOString() }],
+      };
+    });
+    setQuery("");
+    setManual({ calories: 0, protein: 0, fiber: 0 });
+  };
+
+  const submitManual = (event: FormEvent) => {
+    event.preventDefault();
+    if (!query.trim()) return;
+    logFood({ id: uid("food"), name: query.trim(), calories: manual.calories, protein: manual.protein, fiber: manual.fiber, timesLogged: 0 });
+  };
+
+  return (
+    <section className="today-flow">
+      <article className="today-hero">
+        <div>
+          <p className="eyebrow">Quick food journey</p>
+          <h2>What are you eating right now?</h2>
+          <p>Twinge starts with the meal that makes sense for the time of day, but you can switch it before saving.</p>
+        </div>
+        <div className="meal-suggestion">
+          <Clock size={18} />
+          <span>Suggested meal</span>
+          <strong>{suggestedMeal}</strong>
+        </div>
+      </article>
+
+      <div className="meal-picker">
+        {meals.map((item) => (
+          <button key={item} className={meal === item ? "meal-chip active" : "meal-chip"} onClick={() => setMeal(item)}>
+            {item}
+          </button>
+        ))}
+      </div>
+
+      <section className="grid two">
+        <Panel title="Add food" icon={<Utensils size={18} />}>
+          <form className="form" onSubmit={submitManual}>
+            <label>Search or type food<input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Greek yogurt, banana, chicken bowl..." /></label>
+            {matches.length > 0 && <div className="match-box">{matches.slice(0, 5).map((food) => <button type="button" key={food.id} onClick={() => logFood(food)}>Add {food.name} · {food.calories} kcal</button>)}</div>}
+            <div className="row">
+              <label>Calories<input type="number" value={manual.calories} onChange={(event) => setManual({ ...manual, calories: Number(event.target.value) })} /></label>
+              <label>Protein<input type="number" value={manual.protein} onChange={(event) => setManual({ ...manual, protein: Number(event.target.value) })} /></label>
+              <label>Fiber<input type="number" value={manual.fiber} onChange={(event) => setManual({ ...manual, fiber: Number(event.target.value) })} /></label>
+            </div>
+            <button className="button"><Plus size={17} /> Add to {meal}</button>
+          </form>
+        </Panel>
+
+        <Panel title="Usuals & last logged" icon={<Sparkles size={18} />}>
+          {lastFood && <button className="last-meal" onClick={() => logFood(lastFood)}>Repeat last: {lastFood.name}<small>{lastFood.mealTag} · {lastFood.calories} kcal</small></button>}
+          <div className="usual-grid">
+            {frequentFoods.map((food) => (
+              <button key={food.id} onClick={() => logFood(food)}>
+                <strong>{food.name}</strong>
+                <small>{food.calories} kcal · {food.protein}g protein</small>
+              </button>
+            ))}
+          </div>
+          <button className="button ghost" onClick={() => setActive("Dashboard")}>View dashboard <ArrowRight size={17} /></button>
+        </Panel>
+      </section>
+    </section>
   );
 }
 
@@ -441,8 +553,17 @@ function moodEmoji(value: number) {
   return value >= 9 ? "😁" : value >= 7 ? "🙂" : value >= 5 ? "😐" : value >= 3 ? "😟" : "😢";
 }
 
+function mealForNow(): MealTag {
+  const hour = new Date().getHours();
+  if (hour < 11) return "Breakfast";
+  if (hour < 16) return "Lunch";
+  if (hour < 21) return "Dinner";
+  return "Snacks";
+}
+
 function navIcon(item: string) {
   const icons: Record<string, React.ReactNode> = {
+    Today: <Sparkles size={18} />,
     Dashboard: <BarChart3 size={18} />,
     Food: <Apple size={18} />,
     Gym: <Dumbbell size={18} />,
