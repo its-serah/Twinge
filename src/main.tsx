@@ -13,6 +13,7 @@ import {
   Download,
   Flame,
   HeartPulse,
+  Pencil,
   Plus,
   Settings,
   Footprints,
@@ -34,7 +35,7 @@ import {
 } from "recharts";
 import { lastDays, shortDay, todayKey, uid } from "./lib/date";
 import { exportJson, loadData, saveData } from "./lib/storage";
-import { AppData, FoodItem, HealthGoal, Intensity, MealTag, SymptomType } from "./lib/types";
+import { AppData, FoodItem, FoodLog, HealthGoal, Intensity, MealTag, SymptomType } from "./lib/types";
 import "./styles/app.css";
 
 const meals: MealTag[] = ["Breakfast", "Lunch", "Dinner", "Snacks"];
@@ -53,7 +54,7 @@ const commonFoods: FoodItem[] = [
 function App() {
   const [data, setData] = useState<AppData>(() => loadData());
   const [active, setActive] = useState("Today");
-  const [entered, setEntered] = useState(false);
+  const [stage, setStage] = useState<"landing" | "onboarding" | "app">("landing");
 
   useEffect(() => saveData(data), [data]);
 
@@ -89,8 +90,12 @@ function App() {
     setData((current) => ({ ...current, profile: { ...current.profile, ...patch } }));
   };
 
-  if (!entered) {
-    return <LandingPage onEnter={() => setEntered(true)} />;
+  if (stage === "landing") {
+    return <LandingPage onEnter={() => setStage("onboarding")} />;
+  }
+
+  if (stage === "onboarding") {
+    return <OnboardingPage data={data} setData={setData} onDone={() => setStage("app")} />;
   }
 
   return (
@@ -167,16 +172,95 @@ function LandingPage({ onEnter }: { onEnter: () => void }) {
   );
 }
 
+function OnboardingPage({ data, setData, onDone }: { data: AppData; setData: React.Dispatch<React.SetStateAction<AppData>>; onDone: () => void }) {
+  const [name, setName] = useState(data.profile.name || "Sarah");
+  const [calorieGoal, setCalorieGoal] = useState(data.profile.calorieGoal);
+  const [waterGoal, setWaterGoal] = useState(data.profile.waterGoal);
+  const [selectedFoods, setSelectedFoods] = useState<string[]>(data.foodLibrary.map((food) => food.name));
+
+  const toggleFood = (food: string) => {
+    setSelectedFoods((current) => current.includes(food) ? current.filter((item) => item !== food) : [...current, food]);
+  };
+
+  const finish = (event: FormEvent) => {
+    event.preventDefault();
+    setData((current) => {
+      const existing = new Set(current.foodLibrary.map((food) => food.name.toLowerCase()));
+      const additions = selectedFoods
+        .filter((food) => !existing.has(food.toLowerCase()))
+        .map((food) => ({ id: uid("food"), name: food, calories: 0, protein: 0, fiber: 0, timesLogged: 0 }));
+
+      return {
+        ...current,
+        profile: {
+          ...current.profile,
+          name,
+          calorieGoal,
+          waterGoal,
+          foodSetupDone: true,
+        },
+        foodLibrary: [...current.foodLibrary, ...additions],
+      };
+    });
+    onDone();
+  };
+
+  return (
+    <main className="onboarding-shell">
+      <form className="onboarding-card" onSubmit={finish}>
+        <p className="eyebrow">Set your tiny daily base</p>
+        <h1>Let twinge learn your usuals.</h1>
+        <div className="onboarding-grid">
+          <label>Name<input value={name} onChange={(event) => setName(event.target.value)} /></label>
+          <label>Calorie goal<input type="number" value={calorieGoal} onChange={(event) => setCalorieGoal(Number(event.target.value))} /></label>
+          <label>Water goal<input type="number" value={waterGoal} onChange={(event) => setWaterGoal(Number(event.target.value))} /></label>
+        </div>
+        <div>
+          <h2><Apple size={18} /> Usual foods</h2>
+          <div className="onboarding-foods">
+            {starterFoods.map((food) => (
+              <button type="button" key={food} className={selectedFoods.includes(food) ? "onboarding-chip active" : "onboarding-chip"} onClick={() => toggleFood(food)}>
+                {selectedFoods.includes(food) && <CheckCircle2 size={16} />}
+                {food}
+              </button>
+            ))}
+          </div>
+        </div>
+        <button className="button onboarding-submit">Start logging <ArrowRight size={18} /></button>
+      </form>
+    </main>
+  );
+}
+
 function TodayPage({ data, setData, setActive }: { data: AppData; setData: React.Dispatch<React.SetStateAction<AppData>>; setActive: (tab: string) => void }) {
   const suggestedMeal = mealForNow();
   const lastFood = data.foodLogs.slice().reverse()[0];
+  const todayFoodLogs = data.foodLogs.filter((log) => log.loggedAt.startsWith(todayKey())).slice().reverse();
   const [meal, setMeal] = useState<MealTag>((lastFood?.mealTag ?? suggestedMeal) as MealTag);
   const [query, setQuery] = useState("");
   const [manual, setManual] = useState({ calories: 0, protein: 0, fiber: 0 });
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [confirmation, setConfirmation] = useState("");
   const matches = [...data.foodLibrary, ...commonFoods].filter((food) => food.name.toLowerCase().includes(query.toLowerCase()) && query.trim());
   const frequentFoods = data.foodLibrary.slice().sort((a, b) => b.timesLogged - a.timesLogged).slice(0, 6);
 
+  const clearForm = () => {
+    setQuery("");
+    setManual({ calories: 0, protein: 0, fiber: 0 });
+    setEditingId(null);
+  };
+
   const logFood = (food: FoodItem) => {
+    if (editingId) {
+      setData((current) => ({
+        ...current,
+        foodLogs: current.foodLogs.map((log) => log.id === editingId ? { ...log, name: food.name, calories: food.calories, protein: food.protein, fiber: food.fiber, mealTag: meal } : log),
+      }));
+      setConfirmation(`Updated ${food.name} in ${meal}.`);
+      clearForm();
+      return;
+    }
+
     setData((current) => {
       const library = current.foodLibrary.some((item) => item.name.toLowerCase() === food.name.toLowerCase())
         ? current.foodLibrary.map((item) => item.name.toLowerCase() === food.name.toLowerCase() ? { ...item, timesLogged: item.timesLogged + 1 } : item)
@@ -188,14 +272,28 @@ function TodayPage({ data, setData, setActive }: { data: AppData; setData: React
         foodLogs: [...current.foodLogs, { ...food, id: uid("log"), mealTag: meal, loggedAt: new Date().toISOString() }],
       };
     });
-    setQuery("");
-    setManual({ calories: 0, protein: 0, fiber: 0 });
+    setConfirmation(`Added ${food.name} to ${meal}.`);
+    clearForm();
   };
 
   const submitManual = (event: FormEvent) => {
     event.preventDefault();
     if (!query.trim()) return;
     logFood({ id: uid("food"), name: query.trim(), calories: manual.calories, protein: manual.protein, fiber: manual.fiber, timesLogged: 0 });
+  };
+
+  const editFoodLog = (log: FoodLog) => {
+    setEditingId(log.id);
+    setMeal(log.mealTag);
+    setQuery(log.name);
+    setManual({ calories: log.calories, protein: log.protein, fiber: log.fiber });
+    setConfirmation(`Editing ${log.name}. Save it back to ${log.mealTag}.`);
+  };
+
+  const deleteFoodLog = (id: string) => {
+    setData((current) => ({ ...current, foodLogs: current.foodLogs.filter((log) => log.id !== id) }));
+    setConfirmation("Removed that food from today.");
+    if (editingId === id) clearForm();
   };
 
   return (
@@ -213,6 +311,8 @@ function TodayPage({ data, setData, setActive }: { data: AppData; setData: React
         </div>
       </article>
 
+      {confirmation && <div className="added-toast"><CheckCircle2 size={18} /> {confirmation}</div>}
+
       <div className="meal-picker">
         {meals.map((item) => (
           <button key={item} className={meal === item ? "meal-chip active" : "meal-chip"} onClick={() => setMeal(item)}>
@@ -222,16 +322,19 @@ function TodayPage({ data, setData, setActive }: { data: AppData; setData: React
       </div>
 
       <section className="grid two">
-        <Panel title="Add food" icon={<Utensils size={18} />}>
+        <Panel title={editingId ? "Edit food" : "Add food"} icon={<Utensils size={18} />}>
           <form className="form" onSubmit={submitManual}>
             <label>Search or type food<input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Greek yogurt, banana, chicken bowl..." /></label>
-            {matches.length > 0 && <div className="match-box">{matches.slice(0, 5).map((food) => <button type="button" key={food.id} onClick={() => logFood(food)}>Add {food.name} · {food.calories} kcal</button>)}</div>}
+            {matches.length > 0 && <div className="match-box">{matches.slice(0, 5).map((food) => <button type="button" key={food.id} onClick={() => logFood(food)}>Use {food.name} · {food.calories} kcal</button>)}</div>}
             <div className="row">
               <label>Calories<input type="number" value={manual.calories} onChange={(event) => setManual({ ...manual, calories: Number(event.target.value) })} /></label>
               <label>Protein<input type="number" value={manual.protein} onChange={(event) => setManual({ ...manual, protein: Number(event.target.value) })} /></label>
               <label>Fiber<input type="number" value={manual.fiber} onChange={(event) => setManual({ ...manual, fiber: Number(event.target.value) })} /></label>
             </div>
-            <button className="button"><Plus size={17} /> Add to {meal}</button>
+            <div className="form-actions">
+              <button className="button"><Plus size={17} /> {editingId ? "Save food" : `Add to ${meal}`}</button>
+              {editingId && <button type="button" className="button ghost" onClick={clearForm}>Cancel</button>}
+            </div>
           </form>
         </Panel>
 
@@ -248,6 +351,23 @@ function TodayPage({ data, setData, setActive }: { data: AppData; setData: React
           <button className="button ghost" onClick={() => setActive("Dashboard")}>View dashboard <ArrowRight size={17} /></button>
         </Panel>
       </section>
+
+      <Panel title="Today's food" icon={<Apple size={18} />}>
+        <div className="today-food-list">
+          {todayFoodLogs.length ? todayFoodLogs.map((log) => (
+            <article key={log.id} className="logged-food">
+              <div>
+                <strong>{log.name}</strong>
+                <small>{log.mealTag} · {log.calories} kcal · {log.protein}g protein · {log.fiber}g fiber</small>
+              </div>
+              <div className="food-actions">
+                <button aria-label={`Edit ${log.name}`} onClick={() => editFoodLog(log)}><Pencil size={16} /></button>
+                <button aria-label={`Delete ${log.name}`} onClick={() => deleteFoodLog(log.id)}><Trash2 size={16} /></button>
+              </div>
+            </article>
+          )) : <p className="empty-note">Nothing logged yet. Add the first thing you ate today.</p>}
+        </div>
+      </Panel>
     </section>
   );
 }
