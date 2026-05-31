@@ -54,7 +54,7 @@ const commonFoods: FoodItem[] = [
 function App() {
   const [data, setData] = useState<AppData>(() => loadData());
   const [active, setActive] = useState("Today");
-  const [stage, setStage] = useState<"landing" | "onboarding" | "app">("landing");
+  const [stage, setStage] = useState<"landing" | "app">("landing");
 
   useEffect(() => saveData(data), [data]);
 
@@ -91,11 +91,7 @@ function App() {
   };
 
   if (stage === "landing") {
-    return <LandingPage onEnter={() => setStage("onboarding")} />;
-  }
-
-  if (stage === "onboarding") {
-    return <OnboardingPage data={data} setData={setData} onDone={() => setStage("app")} />;
+    return <LandingPage onEnter={() => setStage("app")} />;
   }
 
   return (
@@ -232,17 +228,15 @@ function OnboardingPage({ data, setData, onDone }: { data: AppData; setData: Rea
   );
 }
 
-function TodayPage({ data, setData, setActive }: { data: AppData; setData: React.Dispatch<React.SetStateAction<AppData>>; setActive: (tab: string) => void }) {
-  const suggestedMeal = mealForNow();
-  const lastFood = data.foodLogs.slice().reverse()[0];
+function TodayPage({ data, setData }: { data: AppData; setData: React.Dispatch<React.SetStateAction<AppData>>; setActive: (tab: string) => void }) {
+  const meal = mealForNow();
   const todayFoodLogs = data.foodLogs.filter((log) => log.loggedAt.startsWith(todayKey())).slice().reverse();
-  const [meal, setMeal] = useState<MealTag>((lastFood?.mealTag ?? suggestedMeal) as MealTag);
   const [query, setQuery] = useState("");
   const [manual, setManual] = useState({ calories: 0, protein: 0, fiber: 0 });
   const [editingId, setEditingId] = useState<string | null>(null);
   const [confirmation, setConfirmation] = useState("");
   const matches = [...data.foodLibrary, ...commonFoods].filter((food) => food.name.toLowerCase().includes(query.toLowerCase()) && query.trim());
-  const frequentFoods = data.foodLibrary.slice().sort((a, b) => b.timesLogged - a.timesLogged).slice(0, 6);
+  const suggestedFoods = mealSuggestions(data, meal);
 
   const clearForm = () => {
     setQuery("");
@@ -256,7 +250,7 @@ function TodayPage({ data, setData, setActive }: { data: AppData; setData: React
         ...current,
         foodLogs: current.foodLogs.map((log) => log.id === editingId ? { ...log, name: food.name, calories: food.calories, protein: food.protein, fiber: food.fiber, mealTag: meal } : log),
       }));
-      setConfirmation(`Updated ${food.name} in ${meal}.`);
+      setConfirmation(`Updated ${food.name}.`);
       clearForm();
       return;
     }
@@ -284,10 +278,9 @@ function TodayPage({ data, setData, setActive }: { data: AppData; setData: React
 
   const editFoodLog = (log: FoodLog) => {
     setEditingId(log.id);
-    setMeal(log.mealTag);
     setQuery(log.name);
     setManual({ calories: log.calories, protein: log.protein, fiber: log.fiber });
-    setConfirmation(`Editing ${log.name}. Save it back to ${log.mealTag}.`);
+    setConfirmation(`Editing ${log.name}.`);
   };
 
   const deleteFoodLog = (id: string) => {
@@ -297,62 +290,51 @@ function TodayPage({ data, setData, setActive }: { data: AppData; setData: React
   };
 
   return (
-    <section className="today-flow">
-      <article className="today-hero">
+    <section className="today-flow simple-food-flow">
+      <article className="food-now-card">
         <div>
-          <p className="eyebrow">Quick food journey</p>
-          <h2>What are you eating right now?</h2>
-          <p>Twinge starts with the meal that makes sense for the time of day, but you can switch it before saving.</p>
+          <p className="eyebrow">{new Date().toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" })}</p>
+          <h2>Looks like {meal.toLowerCase()}.</h2>
+          <p>Select what you usually eat around now. If it is not here, add it manually.</p>
         </div>
-        <div className="meal-suggestion">
+        <div className="meal-suggestion compact">
           <Clock size={18} />
-          <span>Suggested meal</span>
-          <strong>{suggestedMeal}</strong>
+          <span>Auto-selected</span>
+          <strong>{meal}</strong>
         </div>
       </article>
 
       {confirmation && <div className="added-toast"><CheckCircle2 size={18} /> {confirmation}</div>}
 
-      <div className="meal-picker">
-        {meals.map((item) => (
-          <button key={item} className={meal === item ? "meal-chip active" : "meal-chip"} onClick={() => setMeal(item)}>
-            {item}
-          </button>
-        ))}
-      </div>
+      <Panel title={`Suggested for ${meal}`} icon={<Sparkles size={18} />}>
+        <div className="suggested-food-grid">
+          {suggestedFoods.length ? suggestedFoods.map((food) => (
+            <button key={food.id} onClick={() => logFood(food)}>
+              <strong>{food.name}</strong>
+              <small>{food.calories} kcal · {food.protein}g protein</small>
+            </button>
+          )) : <p className="empty-note">No usual foods for this time yet. Add one below and Twinge will remember it.</p>}
+        </div>
+      </Panel>
 
-      <section className="grid two">
-        <Panel title={editingId ? "Edit food" : "Add food"} icon={<Utensils size={18} />}>
-          <form className="form" onSubmit={submitManual}>
-            <label>Search or type food<input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Greek yogurt, banana, chicken bowl..." /></label>
-            {matches.length > 0 && <div className="match-box">{matches.slice(0, 5).map((food) => <button type="button" key={food.id} onClick={() => logFood(food)}>Use {food.name} · {food.calories} kcal</button>)}</div>}
-            <div className="row">
-              <label>Calories<input type="number" value={manual.calories} onChange={(event) => setManual({ ...manual, calories: Number(event.target.value) })} /></label>
-              <label>Protein<input type="number" value={manual.protein} onChange={(event) => setManual({ ...manual, protein: Number(event.target.value) })} /></label>
-              <label>Fiber<input type="number" value={manual.fiber} onChange={(event) => setManual({ ...manual, fiber: Number(event.target.value) })} /></label>
-            </div>
-            <div className="form-actions">
-              <button className="button"><Plus size={17} /> {editingId ? "Save food" : `Add to ${meal}`}</button>
-              {editingId && <button type="button" className="button ghost" onClick={clearForm}>Cancel</button>}
-            </div>
-          </form>
-        </Panel>
-
-        <Panel title="Usuals & last logged" icon={<Sparkles size={18} />}>
-          {lastFood && <button className="last-meal" onClick={() => logFood(lastFood)}>Repeat last: {lastFood.name}<small>{lastFood.mealTag} · {lastFood.calories} kcal</small></button>}
-          <div className="usual-grid">
-            {frequentFoods.map((food) => (
-              <button key={food.id} onClick={() => logFood(food)}>
-                <strong>{food.name}</strong>
-                <small>{food.calories} kcal · {food.protein}g protein</small>
-              </button>
-            ))}
+      <details className="manual-food" open={suggestedFoods.length === 0 || Boolean(editingId)}>
+        <summary>{editingId ? "Edit food" : "Add something else"}</summary>
+        <form className="form" onSubmit={submitManual}>
+          <label>Food name<input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Type what you ate" /></label>
+          {matches.length > 0 && <div className="match-box">{matches.slice(0, 5).map((food) => <button type="button" key={food.id} onClick={() => logFood(food)}>Use {food.name} · {food.calories} kcal</button>)}</div>}
+          <div className="row">
+            <label>Calories<input type="number" value={manual.calories} onChange={(event) => setManual({ ...manual, calories: Number(event.target.value) })} /></label>
+            <label>Protein<input type="number" value={manual.protein} onChange={(event) => setManual({ ...manual, protein: Number(event.target.value) })} /></label>
+            <label>Fiber<input type="number" value={manual.fiber} onChange={(event) => setManual({ ...manual, fiber: Number(event.target.value) })} /></label>
           </div>
-          <button className="button ghost" onClick={() => setActive("Dashboard")}>View dashboard <ArrowRight size={17} /></button>
-        </Panel>
-      </section>
+          <div className="form-actions">
+            <button className="button"><Plus size={17} /> {editingId ? "Save" : `Add to ${meal}`}</button>
+            {editingId && <button type="button" className="button ghost" onClick={clearForm}>Cancel</button>}
+          </div>
+        </form>
+      </details>
 
-      <Panel title="Today's food" icon={<Apple size={18} />}>
+      <Panel title="Logged today" icon={<Apple size={18} />}>
         <div className="today-food-list">
           {todayFoodLogs.length ? todayFoodLogs.map((log) => (
             <article key={log.id} className="logged-food">
@@ -365,7 +347,7 @@ function TodayPage({ data, setData, setActive }: { data: AppData; setData: React
                 <button aria-label={`Delete ${log.name}`} onClick={() => deleteFoodLog(log.id)}><Trash2 size={16} /></button>
               </div>
             </article>
-          )) : <p className="empty-note">Nothing logged yet. Add the first thing you ate today.</p>}
+          )) : <p className="empty-note">Nothing logged yet today.</p>}
         </div>
       </Panel>
     </section>
@@ -671,6 +653,39 @@ function List({ items }: { items: string[] }) {
 
 function moodEmoji(value: number) {
   return value >= 9 ? "😁" : value >= 7 ? "🙂" : value >= 5 ? "😐" : value >= 3 ? "😟" : "😢";
+}
+
+function mealSuggestions(data: AppData, meal: MealTag): FoodItem[] {
+  const mealLogs = data.foodLogs.filter((log) => log.mealTag === meal);
+  const byName = new Map<string, FoodItem & { score: number; lastLogged: string }>();
+
+  mealLogs.forEach((log) => {
+    const key = log.name.toLowerCase();
+    const existing = byName.get(key);
+    if (!existing) {
+      byName.set(key, { ...log, timesLogged: 1, score: 1, lastLogged: log.loggedAt });
+      return;
+    }
+    byName.set(key, {
+      ...existing,
+      calories: log.calories,
+      protein: log.protein,
+      fiber: log.fiber,
+      score: existing.score + 1,
+      lastLogged: log.loggedAt > existing.lastLogged ? log.loggedAt : existing.lastLogged,
+    });
+  });
+
+  const loggedSuggestions = Array.from(byName.values())
+    .sort((a, b) => b.score - a.score || b.lastLogged.localeCompare(a.lastLogged))
+    .slice(0, 6);
+
+  if (loggedSuggestions.length) return loggedSuggestions;
+
+  return data.foodLibrary
+    .slice()
+    .sort((a, b) => b.timesLogged - a.timesLogged)
+    .slice(0, 6);
 }
 
 function mealForNow(): MealTag {
