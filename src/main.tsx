@@ -104,7 +104,7 @@ function App() {
     <div className="app">
       <aside className="sidebar">
         <div className="brand">
-          <div className="brand-mark"><HeartPulse size={20} /></div>
+          <div className="brand-mark"><img src="/LOGOTWINGE.jpg" alt="Twinge logo" /></div>
           <div>
             <strong>twinge.</strong>
             <span>feel it. track it.</span>
@@ -162,7 +162,7 @@ function LandingPage({ onEnter }: { onEnter: () => void }) {
   return (
     <main className="landing">
       <section className="landing-card">
-        <div className="landing-mark"><HeartPulse size={30} /></div>
+        <div className="landing-mark"><img src="/LOGOTWINGE.jpg" alt="Twinge logo" /></div>
         <p className="eyebrow">feel it. track it. understand it.</p>
         <h1>twinge.</h1>
         <p className="landing-copy">A soft little home for food, water, workouts, symptoms, mood, and the patterns your body keeps trying to tell you.</p>
