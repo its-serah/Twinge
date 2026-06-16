@@ -26,8 +26,8 @@ export const defaultData: AppData = {
     { id: uid("food"), name: "Protein shake", calories: 180, protein: 28, fiber: 1, timesLogged: 4 },
   ],
   foodLogs: [
-    { id: uid("log"), name: "Greek yogurt", calories: 130, protein: 17, fiber: 0, timesLogged: 3, mealTag: "Breakfast", loggedAt: `${today}T08:15:00` },
-    { id: uid("log"), name: "Chicken rice bowl", calories: 520, protein: 38, fiber: 5, timesLogged: 5, mealTag: "Lunch", loggedAt: `${today}T13:20:00` },
+    { id: uid("log"), name: "Greek yogurt", calories: 130, protein: 17, fiber: 0, timesLogged: 3, mealTag: "Breakfast", feeling: "Felt good", loggedAt: `${today}T08:15:00` },
+    { id: uid("log"), name: "Chicken rice bowl", calories: 520, protein: 38, fiber: 5, timesLogged: 5, mealTag: "Lunch", feeling: "Energized", loggedAt: `${today}T13:20:00` },
   ],
   workoutLogs: [
     {

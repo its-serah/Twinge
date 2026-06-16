@@ -6,6 +6,7 @@ import {
   ArrowRight,
   BarChart3,
   Brain,
+  CalendarDays,
   CheckCircle2,
   Clock,
   Dumbbell,
@@ -35,10 +36,11 @@ import {
 } from "recharts";
 import { lastDays, shortDay, todayKey, uid } from "./lib/date";
 import { exportJson, loadData, saveData } from "./lib/storage";
-import { AppData, FoodItem, FoodLog, HealthGoal, Intensity, MealTag, SymptomType } from "./lib/types";
+import { AppData, FoodItem, FoodLog, HealthGoal, Intensity, MealFeeling, MealTag, SymptomType } from "./lib/types";
 import "./styles/app.css";
 
 const meals: MealTag[] = ["Breakfast", "Lunch", "Dinner", "Snacks"];
+const mealFeelings: MealFeeling[] = ["Neutral", "Felt good", "Energized", "Bloated", "Crashed", "Heavy"];
 const symptomTypes: SymptomType[] = ["Soreness", "Tightness", "Sharp pain", "Ache", "Other"];
 const locations = ["Shin", "Shank / Calf", "Knee", "Ankle", "Thigh", "Hip", "Back", "Stomach", "Head", "Other"];
 const intensities: Intensity[] = ["Low", "Medium", "High"];
@@ -90,6 +92,10 @@ function App() {
     setData((current) => ({ ...current, profile: { ...current.profile, ...patch } }));
   };
 
+  const addWater = (amountMl: number) => {
+    setData((current) => ({ ...current, waterLogs: [...current.waterLogs, { id: uid("water"), amountMl, loggedAt: new Date().toISOString() }] }));
+  };
+
   if (stage === "landing") {
     return <LandingPage onEnter={() => setStage("app")} />;
   }
@@ -137,7 +143,7 @@ function App() {
             todayMental={todayMental}
             trends={trends}
             setActive={setActive}
-            addWater={(amountMl) => setData((current) => ({ ...current, waterLogs: [...current.waterLogs, { id: uid("water"), amountMl, loggedAt: new Date().toISOString() }] }))}
+            addWater={addWater}
           />
         )}
         {active === "Food" && <FoodPage data={data} setData={setData} totals={totals} />}
@@ -146,6 +152,7 @@ function App() {
         {active === "Check-in" && <CheckInPage data={data} setData={setData} todayWaterMl={todayWaterMl} />}
         {active === "Profile" && <ProfilePage data={data} setData={setData} setProfile={setProfile} />}
       </main>
+      <QuickLogDock setActive={setActive} addWater={addWater} />
     </div>
   );
 }
@@ -233,6 +240,7 @@ function TodayPage({ data, setData }: { data: AppData; setData: React.Dispatch<R
   const todayFoodLogs = data.foodLogs.filter((log) => log.loggedAt.startsWith(todayKey())).slice().reverse();
   const [query, setQuery] = useState("");
   const [manual, setManual] = useState({ calories: 0, protein: 0, fiber: 0 });
+  const [feeling, setFeeling] = useState<MealFeeling>("Neutral");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [confirmation, setConfirmation] = useState("");
   const matches = [...data.foodLibrary, ...commonFoods].filter((food) => food.name.toLowerCase().includes(query.toLowerCase()) && query.trim());
@@ -248,7 +256,7 @@ function TodayPage({ data, setData }: { data: AppData; setData: React.Dispatch<R
     if (editingId) {
       setData((current) => ({
         ...current,
-        foodLogs: current.foodLogs.map((log) => log.id === editingId ? { ...log, name: food.name, calories: food.calories, protein: food.protein, fiber: food.fiber, mealTag: meal } : log),
+        foodLogs: current.foodLogs.map((log) => log.id === editingId ? { ...log, name: food.name, calories: food.calories, protein: food.protein, fiber: food.fiber, mealTag: meal, feeling } : log),
       }));
       setConfirmation(`Updated ${food.name}.`);
       clearForm();
@@ -263,7 +271,7 @@ function TodayPage({ data, setData }: { data: AppData; setData: React.Dispatch<R
       return {
         ...current,
         foodLibrary: library,
-        foodLogs: [...current.foodLogs, { ...food, id: uid("log"), mealTag: meal, loggedAt: new Date().toISOString() }],
+        foodLogs: [...current.foodLogs, { ...food, id: uid("log"), mealTag: meal, feeling, loggedAt: new Date().toISOString() }],
       };
     });
     setConfirmation(`Added ${food.name} to ${meal}.`);
@@ -280,6 +288,7 @@ function TodayPage({ data, setData }: { data: AppData; setData: React.Dispatch<R
     setEditingId(log.id);
     setQuery(log.name);
     setManual({ calories: log.calories, protein: log.protein, fiber: log.fiber });
+    setFeeling(log.feeling ?? "Neutral");
     setConfirmation(`Editing ${log.name}.`);
   };
 
@@ -321,6 +330,7 @@ function TodayPage({ data, setData }: { data: AppData; setData: React.Dispatch<R
         <summary>{editingId ? "Edit food" : "Add something else"}</summary>
         <form className="form" onSubmit={submitManual}>
           <label>Food name<input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Type what you ate" /></label>
+          <label>How did it feel?<select value={feeling} onChange={(event) => setFeeling(event.target.value as MealFeeling)}>{mealFeelings.map((item) => <option key={item}>{item}</option>)}</select></label>
           {matches.length > 0 && <div className="match-box">{matches.slice(0, 5).map((food) => <button type="button" key={food.id} onClick={() => logFood(food)}>Use {food.name} · {food.calories} kcal</button>)}</div>}
           <div className="row">
             <label>Calories<input type="number" value={manual.calories} onChange={(event) => setManual({ ...manual, calories: Number(event.target.value) })} /></label>
@@ -340,7 +350,7 @@ function TodayPage({ data, setData }: { data: AppData; setData: React.Dispatch<R
             <article key={log.id} className="logged-food">
               <div>
                 <strong>{log.name}</strong>
-                <small>{log.mealTag} · {log.calories} kcal · {log.protein}g protein · {log.fiber}g fiber</small>
+                <small>{log.mealTag} · {log.calories} kcal · {log.protein}g protein · {log.fiber}g fiber{log.feeling ? ` · ${log.feeling}` : ""}</small>
               </div>
               <div className="food-actions">
                 <button aria-label={`Edit ${log.name}`} onClick={() => editFoodLog(log)}><Pencil size={16} /></button>
@@ -369,6 +379,11 @@ function Dashboard(props: {
   const symptoms = data.symptomLogs.filter((log) => log.loggedAt.startsWith(todayKey()));
   const streak = lastDays(7).filter((date) => (data.stepLogs.find((log) => log.date === date)?.stepCount ?? 0) >= data.profile.stepGoal).length;
   const readiness = Math.round((((todayMental?.mood ?? 5) + (todayMental?.energy ?? 5)) / 20) * 100);
+  const twingeScore = getTwingeScore(data, totals, todayWaterMl, todaySteps, todayMental);
+  const recoveryMode = symptoms.some((symptom) => symptom.severity >= 7) || (todayMental?.energy ?? 10) <= 3 || (todayMental?.sleepHours ?? 8) < 5.5;
+  const insights = getPatternInsights(data);
+  const timeline = getDailyTimeline(data);
+  const weeklyStory = getWeeklyStory(data);
   const journey = [
     { label: "Check in", detail: todayMental ? `${todayMental.mood}/10 mood` : "Mood, energy, sleep", done: Boolean(todayMental), action: "Check-in", icon: <Brain size={18} /> },
     { label: "Fuel", detail: `${totals.calories} kcal logged`, done: totals.calories > 0, action: "Food", icon: <Apple size={18} /> },
@@ -381,19 +396,30 @@ function Dashboard(props: {
       <div className="hero-panel">
         <div className="hero-copy">
           <p className="eyebrow">Your gentle health loop</p>
-          <h2>{readiness}% glow score</h2>
-          <p>Start with a check-in, log what matters, then watch your daily rhythm come together.</p>
+          <h2>{recoveryMode ? "Recovery mode" : `${twingeScore}% twinge score`}</h2>
+          <p>{recoveryMode ? "Today looks like a lower-capacity day. Keep the loop focused on hydration, sleep, and gentle notes." : "Start with a check-in, log what matters, then watch your daily rhythm come together."}</p>
           <div className="hero-tags">
             <span>{totals.protein}g protein</span>
             <span>{totals.fiber}g fiber</span>
             <span>{symptoms.length} symptoms</span>
           </div>
         </div>
-        <div className="readiness-dial" style={{ ["--score" as string]: `${readiness}%` }}>
+        <div className="readiness-dial" style={{ ["--score" as string]: `${recoveryMode ? Math.max(20, readiness - 15) : twingeScore}%` }}>
           <strong>{moodEmoji(todayMental?.mood ?? 5)}</strong>
           <span>{todayMental?.sleepHours ?? 0}h sleep</span>
         </div>
       </div>
+
+      {recoveryMode && (
+        <Panel title="Recovery focus" icon={<HeartPulse size={18} />}>
+          <div className="recovery-grid">
+            <span>Hydrate steadily</span>
+            <span>Keep movement light</span>
+            <span>Follow up on pain tomorrow</span>
+            <span>Prioritize sleep tonight</span>
+          </div>
+        </Panel>
+      )}
 
       <div className="journey">
         {journey.map((step, index) => (
@@ -413,6 +439,37 @@ function Dashboard(props: {
         <Metric icon={<Brain />} label="Mood" value={todayMental ? `${moodEmoji(todayMental.mood)} ${todayMental.mood}/10` : "No check-in"} detail={`${todayMental?.sleepHours ?? 0}h sleep`} progress={(todayMental?.mood ?? 0) / 10} />
       </div>
 
+      <div className="grid two">
+        <Panel title="Pattern detective" icon={<Sparkles size={18} />}>
+          <div className="insight-grid">
+            {insights.map((insight) => (
+              <article key={insight.title} className="insight-card">
+                <strong>{insight.title}</strong>
+                <p>{insight.copy}</p>
+              </article>
+            ))}
+          </div>
+        </Panel>
+        <Panel title="Weekly body story" icon={<CalendarDays size={18} />}>
+          <div className="story-card">
+            <strong>{weeklyStory.title}</strong>
+            <p>{weeklyStory.copy}</p>
+          </div>
+        </Panel>
+      </div>
+
+      <Panel title="Cause-and-effect timeline" icon={<Clock size={18} />}>
+        <div className="timeline">
+          {timeline.length ? timeline.map((item) => (
+            <article key={`${item.time}-${item.detail}`} className={`timeline-item ${item.kind}`}>
+              <span>{item.time}</span>
+              <strong>{item.label}</strong>
+              <p>{item.detail}</p>
+            </article>
+          )) : <p className="empty-note">No timeline entries yet today.</p>}
+        </div>
+      </Panel>
+
       <div className="quick-strip">
         <button onClick={() => props.setActive("Food")}><Apple size={18} /> Food</button>
         <button onClick={() => props.addWater(250)}><Droplets size={18} /> +250ml</button>
@@ -428,7 +485,7 @@ function Dashboard(props: {
               <XAxis dataKey="day" />
               <YAxis hide />
               <Tooltip />
-              <Bar dataKey="steps" fill="#20706b" radius={[6, 6, 0, 0]} />
+              <Bar dataKey="steps" fill="#ff4610" radius={[6, 6, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </Panel>
@@ -439,9 +496,9 @@ function Dashboard(props: {
               <XAxis dataKey="day" />
               <YAxis domain={[0, 10]} />
               <Tooltip />
-              <Line dataKey="mood" stroke="#b14e2f" strokeWidth={3} />
-              <Line dataKey="energy" stroke="#20706b" strokeWidth={3} />
-              <Line dataKey="sleep" stroke="#514c8f" strokeWidth={3} />
+              <Line dataKey="mood" stroke="#ff4610" strokeWidth={3} />
+              <Line dataKey="energy" stroke="#246b63" strokeWidth={3} />
+              <Line dataKey="sleep" stroke="#d4eae8" strokeWidth={3} />
             </LineChart>
           </ResponsiveContainer>
         </Panel>
@@ -463,6 +520,7 @@ function Dashboard(props: {
 function FoodPage({ data, setData, totals }: { data: AppData; setData: React.Dispatch<React.SetStateAction<AppData>>; totals: { calories: number; protein: number; fiber: number } }) {
   const [query, setQuery] = useState("");
   const [meal, setMeal] = useState<MealTag>("Breakfast");
+  const [feeling, setFeeling] = useState<MealFeeling>("Neutral");
   const [manual, setManual] = useState({ calories: 0, protein: 0, fiber: 0 });
   const matches = [...data.foodLibrary, ...commonFoods].filter((food) => food.name.toLowerCase().includes(query.toLowerCase()) && query.trim());
 
@@ -471,7 +529,7 @@ function FoodPage({ data, setData, totals }: { data: AppData; setData: React.Dis
       const library = current.foodLibrary.some((item) => item.name.toLowerCase() === food.name.toLowerCase())
         ? current.foodLibrary.map((item) => item.name.toLowerCase() === food.name.toLowerCase() ? { ...item, timesLogged: item.timesLogged + 1 } : item)
         : [...current.foodLibrary, { ...food, id: uid("food"), timesLogged: 1 }];
-      return { ...current, foodLibrary: library, foodLogs: [...current.foodLogs, { ...food, id: uid("log"), mealTag: meal, loggedAt: new Date().toISOString() }] };
+      return { ...current, foodLibrary: library, foodLogs: [...current.foodLogs, { ...food, id: uid("log"), mealTag: meal, feeling, loggedAt: new Date().toISOString() }] };
     });
     setQuery("");
   };
@@ -499,6 +557,7 @@ function FoodPage({ data, setData, totals }: { data: AppData; setData: React.Dis
         )}
         <form className="form" onSubmit={submitManual}>
           <label>Meal<select value={meal} onChange={(event) => setMeal(event.target.value as MealTag)}>{meals.map((item) => <option key={item}>{item}</option>)}</select></label>
+          <label>After-meal feel<select value={feeling} onChange={(event) => setFeeling(event.target.value as MealFeeling)}>{mealFeelings.map((item) => <option key={item}>{item}</option>)}</select></label>
           <label>Food name<input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Type a food" /></label>
           {matches.length > 0 && <div className="match-box">{matches.slice(0, 5).map((food) => <button type="button" key={food.id} onClick={() => logFood(food)}>Same as usual? {food.name} · {food.calories} kcal</button>)}</div>}
           <div className="row">
@@ -512,7 +571,7 @@ function FoodPage({ data, setData, totals }: { data: AppData; setData: React.Dis
       <Panel title="Today & library" icon={<Flame size={18} />}>
         <div className="totals"><strong>{totals.calories}</strong><span>kcal</span><strong>{totals.protein}g</strong><span>protein</span><strong>{totals.fiber}g</strong><span>fiber</span></div>
         <Progress value={totals.calories / data.profile.calorieGoal} />
-        <List items={data.foodLogs.filter((log) => log.loggedAt.startsWith(todayKey())).map((log) => `${log.mealTag}: ${log.name} · ${log.calories} kcal`)} />
+        <List items={data.foodLogs.filter((log) => log.loggedAt.startsWith(todayKey())).map((log) => `${log.mealTag}: ${log.name} · ${log.calories} kcal${log.feeling ? ` · ${log.feeling}` : ""}`)} />
         <h3>Food library</h3>
         <div className="library">{data.foodLibrary.map((item) => <span key={item.id}>{item.name}<small>{item.calories} kcal · {item.protein}p · {item.fiber}f</small></span>)}</div>
       </Panel>
@@ -562,6 +621,7 @@ function SymptomsPage({ data, setData }: { data: AppData; setData: React.Dispatc
   return (
     <section className="grid two">
       <Panel title="Symptom log" icon={<HeartPulse size={18} />}>
+        <BodyMap selected={form.bodyLocation} logs={data.symptomLogs} onSelect={(location) => setForm({ ...form, bodyLocation: location, name: location === "Head" ? "Headache" : `${location} pain` })} />
         <div className="quick-strip compact"><button onClick={() => setForm({ ...form, name: "Shin splint", bodyLocation: "Shin", type: "Tightness" })}>Shin splint</button><button onClick={() => setForm({ ...form, name: "Calf soreness", bodyLocation: "Shank / Calf", type: "Soreness" })}>Shank / calf</button></div>
         <form className="form" onSubmit={submit}>
           <label>Name<input value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} /></label>
@@ -572,6 +632,9 @@ function SymptomsPage({ data, setData }: { data: AppData; setData: React.Dispatc
         </form>
       </Panel>
       <Panel title="Symptom history" icon={<BarChart3 size={18} />}>
+        <div className="heat-list">
+          {symptomHeat(data.symptomLogs).map((item) => <span key={item.location}>{item.location}<strong>{item.count}</strong></span>)}
+        </div>
         <List items={data.symptomLogs.slice().reverse().map((log) => `${log.bodyLocation}: ${log.name} · ${log.type} · ${log.severity}/10`)} />
       </Panel>
     </section>
@@ -582,6 +645,7 @@ function CheckInPage({ data, setData, todayWaterMl }: { data: AppData; setData: 
   const existing = data.mentalLogs.find((log) => log.date === todayKey());
   const [form, setForm] = useState(existing ?? { date: todayKey(), mood: 7, energy: 6, sleepHours: 7.5, waterGlasses: Math.round(todayWaterMl / 250), journal: "" });
   const [steps, setSteps] = useState(data.stepLogs.find((log) => log.date === todayKey())?.stepCount ?? 0);
+  const prompts = getCheckInPrompts(data);
   const save = (event: FormEvent) => {
     event.preventDefault();
     setData((current) => ({
@@ -593,6 +657,9 @@ function CheckInPage({ data, setData, todayWaterMl }: { data: AppData; setData: 
   return (
     <section className="grid two">
       <Panel title="Daily check-in" icon={<Brain size={18} />}>
+        <div className="prompt-stack">
+          {prompts.map((prompt) => <span key={prompt}>{prompt}</span>)}
+        </div>
         <form className="form" onSubmit={save}>
           <label>Mood {moodEmoji(form.mood)} {form.mood}/10<input type="range" min="1" max="10" value={form.mood} onChange={(event) => setForm({ ...form, mood: Number(event.target.value) })} /></label>
           <label>Energy {form.energy}/10<input type="range" min="1" max="10" value={form.energy} onChange={(event) => setForm({ ...form, energy: Number(event.target.value) })} /></label>
@@ -635,6 +702,61 @@ function ProfilePage({ data, setData, setProfile }: { data: AppData; setData: Re
   );
 }
 
+function QuickLogDock({ setActive, addWater }: { setActive: (tab: string) => void; addWater: (amountMl: number) => void }) {
+  return (
+    <nav className="quick-dock" aria-label="Quick log">
+      <button onClick={() => setActive("Food")} aria-label="Log food"><Apple size={19} /><span>Food</span></button>
+      <button onClick={() => addWater(250)} aria-label="Add water"><Droplets size={19} /><span>Water</span></button>
+      <button onClick={() => setActive("Symptoms")} aria-label="Log symptom"><HeartPulse size={19} /><span>Pain</span></button>
+      <button onClick={() => setActive("Check-in")} aria-label="Open check-in"><Brain size={19} /><span>Mood</span></button>
+      <button onClick={() => setActive("Gym")} aria-label="Log workout"><Dumbbell size={19} /><span>Gym</span></button>
+    </nav>
+  );
+}
+
+function BodyMap({ selected, logs, onSelect }: { selected: string; logs: AppData["symptomLogs"]; onSelect: (location: string) => void }) {
+  const heat = new Map(symptomHeat(logs).map((item) => [item.location, item.count]));
+  const points = [
+    { location: "Head", x: 50, y: 12 },
+    { location: "Back", x: 50, y: 34 },
+    { location: "Stomach", x: 50, y: 43 },
+    { location: "Hip", x: 50, y: 54 },
+    { location: "Thigh", x: 38, y: 66 },
+    { location: "Knee", x: 62, y: 74 },
+    { location: "Shin", x: 42, y: 84 },
+    { location: "Shank / Calf", x: 60, y: 84 },
+    { location: "Ankle", x: 50, y: 94 },
+  ];
+
+  return (
+    <div className="body-map">
+      <div className="body-silhouette" aria-hidden="true">
+        <span className="head" />
+        <span className="torso" />
+        <span className="arm left" />
+        <span className="arm right" />
+        <span className="leg left" />
+        <span className="leg right" />
+      </div>
+      {points.map((point) => {
+        const count = heat.get(point.location) ?? 0;
+        return (
+          <button
+            key={point.location}
+            className={selected === point.location ? "body-point active" : "body-point"}
+            style={{ left: `${point.x}%`, top: `${point.y}%`, ["--heat" as string]: `${Math.min(1, count / 5)}` }}
+            onClick={() => onSelect(point.location)}
+            type="button"
+            title={`${point.location}${count ? `, ${count} logs` : ""}`}
+          >
+            <span>{count || ""}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 function Metric({ icon, label, value, detail, progress }: { icon: React.ReactNode; label: string; value: string; detail: string; progress: number }) {
   return <article className="metric">{icon}<p>{label}</p><strong>{value}</strong><span>{detail}</span><Progress value={progress} /></article>;
 }
@@ -649,6 +771,107 @@ function Progress({ value }: { value: number }) {
 
 function List({ items }: { items: string[] }) {
   return <div className="list">{items.length ? items.map((item, index) => <p key={`${item}-${index}`}>{item}</p>) : <p>No entries yet.</p>}</div>;
+}
+
+function getTwingeScore(data: AppData, totals: { calories: number }, todayWaterMl: number, todaySteps: number, todayMental?: { mood: number; energy: number; sleepHours: number }) {
+  const symptoms = data.symptomLogs.filter((log) => log.loggedAt.startsWith(todayKey()));
+  const calorieScore = clampScore(100 - Math.abs(totals.calories - data.profile.calorieGoal) / data.profile.calorieGoal * 100);
+  const waterScore = clampScore((todayWaterMl / 250 / data.profile.waterGoal) * 100);
+  const stepScore = clampScore((todaySteps / data.profile.stepGoal) * 100);
+  const moodScore = ((todayMental?.mood ?? 5) / 10) * 100;
+  const energyScore = ((todayMental?.energy ?? 5) / 10) * 100;
+  const sleepScore = clampScore(((todayMental?.sleepHours ?? 7) / 8) * 100);
+  const symptomPenalty = Math.min(30, symptoms.reduce((sum, symptom) => sum + symptom.severity, 0) * 2);
+  return Math.round(clampScore((calorieScore + waterScore + stepScore + moodScore + energyScore + sleepScore) / 6 - symptomPenalty));
+}
+
+function getDailyTimeline(data: AppData) {
+  const today = todayKey();
+  const items = [
+    ...data.foodLogs.filter((log) => log.loggedAt.startsWith(today)).map((log) => ({ time: timeLabel(log.loggedAt), label: `${log.mealTag}: ${log.name}`, detail: `${log.calories} kcal${log.feeling ? ` · ${log.feeling}` : ""}`, kind: "food" })),
+    ...data.waterLogs.filter((log) => log.loggedAt.startsWith(today)).map((log) => ({ time: timeLabel(log.loggedAt), label: "Water", detail: `${log.amountMl} ml`, kind: "water" })),
+    ...data.workoutLogs.filter((log) => log.loggedAt.startsWith(today)).map((log) => ({ time: timeLabel(log.loggedAt), label: log.type, detail: `${log.durationMinutes} min · ${log.intensity}`, kind: "gym" })),
+    ...data.symptomLogs.filter((log) => log.loggedAt.startsWith(today)).map((log) => ({ time: timeLabel(log.loggedAt), label: log.bodyLocation, detail: `${log.type} · ${log.severity}/10`, kind: "symptom" })),
+  ];
+  return items.sort((a, b) => a.time.localeCompare(b.time));
+}
+
+function getPatternInsights(data: AppData) {
+  const highIntensityDates = new Set(data.workoutLogs.filter((log) => log.intensity === "High" || /leg|run|cardio/i.test(log.type)).map((log) => log.loggedAt.slice(0, 10)));
+  const painAfterTraining = data.symptomLogs.filter((log) => highIntensityDates.has(log.loggedAt.slice(0, 10)) && /shin|shank|calf|knee|ankle/i.test(log.bodyLocation)).length;
+  const lowSleepDays = data.mentalLogs.filter((log) => log.sleepHours < 6.5);
+  const lowSleepSnackCalories = average(lowSleepDays.map((day) => data.foodLogs.filter((log) => log.loggedAt.startsWith(day.date) && log.mealTag === "Snacks").reduce((sum, log) => sum + log.calories, 0)));
+  const taggedMeals = data.foodLogs.filter((log) => log.feeling && log.feeling !== "Neutral");
+  const bestFeeling = mostCommon(taggedMeals.filter((log) => log.feeling === "Felt good" || log.feeling === "Energized").map((log) => log.name));
+  const headacheWaterDays = data.symptomLogs.filter((log) => /head/i.test(log.bodyLocation) || /headache/i.test(log.name)).map((log) => log.loggedAt.slice(0, 10));
+  const lowWaterHeadaches = headacheWaterDays.filter((date) => data.waterLogs.filter((log) => log.loggedAt.startsWith(date)).reduce((sum, log) => sum + log.amountMl, 0) < data.profile.waterGoal * 250).length;
+
+  return [
+    {
+      title: "Pain after movement",
+      copy: painAfterTraining ? `${painAfterTraining} lower-body symptom logs landed on harder training days.` : "No strong lower-body pain pattern after training yet.",
+    },
+    {
+      title: "Sleep and snacking",
+      copy: lowSleepDays.length ? `On lower-sleep days, snacks average ${Math.round(lowSleepSnackCalories)} kcal.` : "Log a few more low-sleep days to compare snack patterns.",
+    },
+    {
+      title: "Food mood memory",
+      copy: bestFeeling ? `${bestFeeling} most often lines up with a better post-meal feeling.` : "Tag meals with how they felt to build food memory.",
+    },
+    {
+      title: "Water and headaches",
+      copy: lowWaterHeadaches ? `${lowWaterHeadaches} headache logs happened before hitting the water goal.` : "No water-headache pattern is visible yet.",
+    },
+  ];
+}
+
+function getWeeklyStory(data: AppData) {
+  const days = lastDays(7);
+  const workouts = data.workoutLogs.filter((log) => days.includes(log.loggedAt.slice(0, 10)));
+  const waterWins = days.filter((date) => data.waterLogs.filter((log) => log.loggedAt.startsWith(date)).reduce((sum, log) => sum + log.amountMl, 0) >= data.profile.waterGoal * 250).length;
+  const bestSleep = data.mentalLogs.filter((log) => days.includes(log.date)).sort((a, b) => b.sleepHours - a.sleepHours)[0];
+  const avgMood = average(data.mentalLogs.filter((log) => days.includes(log.date)).map((log) => log.mood));
+  const symptomCount = data.symptomLogs.filter((log) => days.includes(log.loggedAt.slice(0, 10))).length;
+  return {
+    title: `${workouts.length} workouts, ${waterWins} water wins`,
+    copy: `This week averaged ${avgMood ? avgMood.toFixed(1) : "0.0"}/10 mood${bestSleep ? `, with best sleep on ${shortDay(bestSleep.date)} at ${bestSleep.sleepHours}h` : ""}. You logged ${symptomCount} symptom note${symptomCount === 1 ? "" : "s"}.`,
+  };
+}
+
+function getCheckInPrompts(data: AppData) {
+  const yesterday = lastDays(2)[0];
+  const yesterdayPain = data.symptomLogs.filter((log) => log.loggedAt.startsWith(yesterday)).sort((a, b) => b.severity - a.severity)[0];
+  const lastMental = data.mentalLogs.slice().sort((a, b) => b.date.localeCompare(a.date))[0];
+  const prompts = [];
+  if (yesterdayPain) prompts.push(`Yesterday's ${yesterdayPain.bodyLocation.toLowerCase()} was ${yesterdayPain.severity}/10. How is it today?`);
+  if (lastMental?.sleepHours && lastMental.sleepHours < 6.5) prompts.push(`Sleep was ${lastMental.sleepHours}h last check-in. Watch today's energy.`);
+  if (!prompts.length) prompts.push("What changed in your body since yesterday?");
+  return prompts;
+}
+
+function symptomHeat(logs: AppData["symptomLogs"]) {
+  const counts = new Map<string, number>();
+  logs.forEach((log) => counts.set(log.bodyLocation, (counts.get(log.bodyLocation) ?? 0) + 1));
+  return Array.from(counts, ([location, count]) => ({ location, count })).sort((a, b) => b.count - a.count).slice(0, 6);
+}
+
+function average(values: number[]) {
+  return values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : 0;
+}
+
+function mostCommon(values: string[]) {
+  const counts = new Map<string, number>();
+  values.forEach((value) => counts.set(value, (counts.get(value) ?? 0) + 1));
+  return Array.from(counts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "";
+}
+
+function clampScore(value: number) {
+  return Math.min(100, Math.max(0, value));
+}
+
+function timeLabel(value: string) {
+  return new Date(value).toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
 }
 
 function moodEmoji(value: number) {

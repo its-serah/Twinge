@@ -4,7 +4,7 @@
   "description": "feel it. track it. understand it.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#f7f4ed",
-  "theme_color": "#f7f4ed",
+  "background_color": "#d4eae8",
+  "theme_color": "#d4eae8",
   "icons": []
 }

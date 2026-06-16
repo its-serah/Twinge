@@ -1,4 +1,5 @@
 export type MealTag = "Breakfast" | "Lunch" | "Dinner" | "Snacks";
+export type MealFeeling = "Felt good" | "Energized" | "Bloated" | "Crashed" | "Heavy" | "Neutral";
 export type SymptomType = "Soreness" | "Tightness" | "Sharp pain" | "Ache" | "Other";
 export type Intensity = "Low" | "Medium" | "High";
 export type HealthGoal = "Lose weight" | "Maintain" | "Gain muscle" | "Improve energy";
@@ -15,6 +16,7 @@ export type FoodItem = {
 
 export type FoodLog = FoodItem & {
   mealTag: MealTag;
+  feeling?: MealFeeling;
   loggedAt: string;
 };
 
