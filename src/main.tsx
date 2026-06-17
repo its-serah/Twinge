@@ -282,7 +282,7 @@ function LandingPage({ onEnter }: { onEnter: () => void }) {
         <p className="landing-copy">Track food, water, workouts, symptoms, and mood in one calm daily loop.</p>
         <div className="landing-actions">
           <button className={launching ? "button landing-button launching" : "button landing-button"} onClick={startTracking} disabled={launching}>
-            <span className="landing-arrow-chip"><ArrowRight size={18} /></span>
+            <span className="landing-arrow-chip"><HeartPulse size={17} /></span>
             <span className="landing-button-label">Start tracking</span>
           </button>
         </div>
