@@ -1292,9 +1292,111 @@ textarea {
   backdrop-filter: blur(20px);
 }
 
+.guided-card {
+  width: min(680px, 100%);
+  min-height: 520px;
+  align-content: start;
+}
+
 .onboarding-card h1 {
   max-width: 720px;
   font-size: clamp(38px, 7vw, 76px);
+}
+
+.guided-card h1 {
+  max-width: 620px;
+  margin-bottom: 4px;
+  font-size: clamp(40px, 7vw, 72px);
+}
+
+.step-progress {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.step-progress span {
+  height: 8px;
+  background: rgba(212, 234, 232, 0.72);
+  border: 1px solid rgba(212, 234, 232, 0.9);
+  border-radius: 999px;
+}
+
+.step-progress span.active {
+  background: #ff4610;
+}
+
+.guided-step {
+  display: grid;
+  align-content: start;
+  min-height: 230px;
+}
+
+.single-field input {
+  min-height: 62px;
+  font-size: 24px;
+  font-weight: 900;
+}
+
+.choice-stack,
+.choice-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.choice-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.choice-card {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  min-height: 68px;
+  padding: 16px;
+  color: #ff4610;
+  background: rgba(212, 234, 232, 0.66);
+  border: 1px solid rgba(212, 234, 232, 0.92);
+  border-radius: 8px;
+  box-shadow: 0 12px 28px rgba(255, 70, 16, 0.1);
+  font-size: 18px;
+  font-weight: 900;
+  text-align: left;
+}
+
+.choice-card.active {
+  color: #d4eae8;
+  background: #ff4610;
+}
+
+.choice-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 16px 34px rgba(255, 70, 16, 0.14);
+}
+
+.onboarding-foods.guided {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.guided-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: auto;
+}
+
+.guided-actions .button:only-child {
+  margin-left: auto;
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  transform: none;
 }
 
 .onboarding-grid {
@@ -1404,6 +1506,15 @@ textarea {
 @media (max-width: 760px) {
   .onboarding-grid,
   .logged-food {
+    grid-template-columns: 1fr;
+  }
+
+  .guided-card {
+    min-height: calc(100vh - 48px);
+  }
+
+  .choice-grid,
+  .onboarding-foods.guided {
     grid-template-columns: 1fr;
   }
 

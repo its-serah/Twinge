@@ -158,7 +158,7 @@ const fontOptions = [
 function App() {
   const [data, setData] = useState<AppData>(() => loadData());
   const [active, setActive] = useState("Today");
-  const [stage, setStage] = useState<"landing" | "app">("landing");
+  const [stage, setStage] = useState<"landing" | "onboarding" | "app">("landing");
 
   useEffect(() => saveData(data), [data]);
 
@@ -203,7 +203,11 @@ function App() {
   }
 
   if (stage === "landing") {
-    return <LandingPage onEnter={() => setStage("app")} />;
+    return <LandingPage onEnter={() => setStage("onboarding")} />;
+  }
+
+  if (stage === "onboarding") {
+    return <OnboardingPage data={data} setData={setData} onDone={() => setStage("app")} />;
   }
 
   return (
@@ -329,17 +333,20 @@ function FontStylesPage() {
 }
 
 function OnboardingPage({ data, setData, onDone }: { data: AppData; setData: React.Dispatch<React.SetStateAction<AppData>>; onDone: () => void }) {
+  const [step, setStep] = useState(0);
   const [name, setName] = useState(data.profile.name || "Sarah");
   const [calorieGoal, setCalorieGoal] = useState(data.profile.calorieGoal);
   const [waterGoal, setWaterGoal] = useState(data.profile.waterGoal);
+  const [goal, setGoal] = useState<HealthGoal>(data.profile.goal);
   const [selectedFoods, setSelectedFoods] = useState<string[]>(data.foodLibrary.map((food) => food.name));
+  const waterOptions = [6, 8, 10, 12];
+  const calorieOptions = goal === "Gain muscle" ? [2200, 2400, 2600, 2800] : goal === "Lose weight" ? [1500, 1700, 1900, 2100] : [1800, 2000, 2200, 2400];
 
   const toggleFood = (food: string) => {
     setSelectedFoods((current) => current.includes(food) ? current.filter((item) => item !== food) : [...current, food]);
   };
 
-  const finish = (event: FormEvent) => {
-    event.preventDefault();
+  const finish = () => {
     setData((current) => {
       const existing = new Set(current.foodLibrary.map((food) => food.name.toLowerCase()));
       const additions = selectedFoods
@@ -351,6 +358,7 @@ function OnboardingPage({ data, setData, onDone }: { data: AppData; setData: Rea
         profile: {
           ...current.profile,
           name,
+          goal,
           calorieGoal,
           waterGoal,
           foodSetupDone: true,
@@ -361,29 +369,103 @@ function OnboardingPage({ data, setData, onDone }: { data: AppData; setData: Rea
     onDone();
   };
 
+  const steps = [
+    {
+      eyebrow: "Step 1 of 5",
+      title: "What should we call you?",
+      body: (
+        <label className="single-field">Name<input value={name} onChange={(event) => setName(event.target.value)} autoFocus /></label>
+      ),
+      canContinue: name.trim().length > 0,
+    },
+    {
+      eyebrow: "Step 2 of 5",
+      title: "What are you focusing on?",
+      body: (
+        <div className="choice-stack">
+          {goals.map((item) => (
+            <button type="button" key={item} className={goal === item ? "choice-card active" : "choice-card"} onClick={() => setGoal(item)}>
+              {goal === item && <CheckCircle2 size={18} />}
+              <span>{item}</span>
+            </button>
+          ))}
+        </div>
+      ),
+      canContinue: true,
+    },
+    {
+      eyebrow: "Step 3 of 5",
+      title: "How much water per day?",
+      body: (
+        <div className="choice-grid">
+          {waterOptions.map((amount) => (
+            <button type="button" key={amount} className={waterGoal === amount ? "choice-card active" : "choice-card"} onClick={() => setWaterGoal(amount)}>
+              {waterGoal === amount && <CheckCircle2 size={18} />}
+              <span>{amount} glasses</span>
+            </button>
+          ))}
+        </div>
+      ),
+      canContinue: true,
+    },
+    {
+      eyebrow: "Step 4 of 5",
+      title: "Pick a calorie target.",
+      body: (
+        <div className="choice-grid">
+          {calorieOptions.map((amount) => (
+            <button type="button" key={amount} className={calorieGoal === amount ? "choice-card active" : "choice-card"} onClick={() => setCalorieGoal(amount)}>
+              {calorieGoal === amount && <CheckCircle2 size={18} />}
+              <span>{amount} kcal</span>
+            </button>
+          ))}
+        </div>
+      ),
+      canContinue: true,
+    },
+    {
+      eyebrow: "Step 5 of 5",
+      title: "Tap your usual foods.",
+      body: (
+        <div className="onboarding-foods guided">
+          {starterFoods.map((food) => (
+            <button type="button" key={food} className={selectedFoods.includes(food) ? "onboarding-chip active" : "onboarding-chip"} onClick={() => toggleFood(food)}>
+              {selectedFoods.includes(food) && <CheckCircle2 size={16} />}
+              {food}
+            </button>
+          ))}
+        </div>
+      ),
+      canContinue: selectedFoods.length > 0,
+    },
+  ];
+
+  const current = steps[step];
+  const next = () => {
+    if (!current.canContinue) return;
+    if (step === steps.length - 1) {
+      finish();
+      return;
+    }
+    setStep((currentStep) => currentStep + 1);
+  };
+
   return (
     <main className="onboarding-shell">
-      <form className="onboarding-card" onSubmit={finish}>
-        <p className="eyebrow">Set your tiny daily base</p>
-        <h1>Let twinge learn your usuals.</h1>
-        <div className="onboarding-grid">
-          <label>Name<input value={name} onChange={(event) => setName(event.target.value)} /></label>
-          <label>Calorie goal<input type="number" value={calorieGoal} onChange={(event) => setCalorieGoal(Number(event.target.value))} /></label>
-          <label>Water goal<input type="number" value={waterGoal} onChange={(event) => setWaterGoal(Number(event.target.value))} /></label>
+      <section className="onboarding-card guided-card">
+        <div className="step-progress" aria-label={`Step ${step + 1} of ${steps.length}`}>
+          {steps.map((item, index) => <span key={item.eyebrow} className={index <= step ? "active" : ""} />)}
         </div>
-        <div>
-          <h2><Apple size={18} /> Usual foods</h2>
-          <div className="onboarding-foods">
-            {starterFoods.map((food) => (
-              <button type="button" key={food} className={selectedFoods.includes(food) ? "onboarding-chip active" : "onboarding-chip"} onClick={() => toggleFood(food)}>
-                {selectedFoods.includes(food) && <CheckCircle2 size={16} />}
-                {food}
-              </button>
-            ))}
-          </div>
+        <p className="eyebrow">{current.eyebrow}</p>
+        <h1>{current.title}</h1>
+        <div className="guided-step">{current.body}</div>
+        <div className="guided-actions">
+          {step > 0 && <button type="button" className="button ghost" onClick={() => setStep((currentStep) => currentStep - 1)}>Back</button>}
+          <button type="button" className="button onboarding-submit" onClick={next} disabled={!current.canContinue}>
+            {step === steps.length - 1 ? "Start logging" : "Next"} <ArrowRight size={18} />
+          </button>
         </div>
-        <button className="button onboarding-submit">Start logging <ArrowRight size={18} /></button>
-      </form>
+      </section>
     </main>
   );
 }
