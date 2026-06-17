@@ -52,6 +52,108 @@ const commonFoods: FoodItem[] = [
   { id: "common_eggs", name: "Eggs", calories: 140, protein: 12, fiber: 0, timesLogged: 0 },
   { id: "common_oats", name: "Oats", calories: 300, protein: 10, fiber: 8, timesLogged: 0 },
 ];
+const fontOptions = [
+  { name: "Rounded Friendly", font: '"Trebuchet MS", "Avenir Next", Avenir, sans-serif', weight: "900" },
+  { name: "Soft Editorial", font: 'Georgia, "Times New Roman", serif', weight: "700" },
+  { name: "Clean Humanist", font: '"Avenir Next", Avenir, "Segoe UI", sans-serif', weight: "800" },
+  { name: "Playful System", font: '"Arial Rounded MT Bold", "Trebuchet MS", sans-serif', weight: "800" },
+  { name: "Calm Classic", font: 'Palatino, "Palatino Linotype", Georgia, serif', weight: "700" },
+  { name: "Modern Simple", font: '"Segoe UI", Roboto, Helvetica, Arial, sans-serif', weight: "800" },
+  { name: "Warm Serif", font: 'Cambria, Georgia, serif', weight: "700" },
+  { name: "Bubble Soft", font: '"Comic Sans MS", "Trebuchet MS", cursive', weight: "800" },
+  { name: "App Rounded", font: 'Verdana, Geneva, sans-serif', weight: "800" },
+  { name: "Friendly Narrow", font: '"Gill Sans", "Gill Sans MT", Calibri, sans-serif', weight: "800" },
+  { name: "Health Journal", font: '"Optima", "Segoe UI", sans-serif', weight: "700" },
+  { name: "Bold Calm", font: 'Tahoma, Geneva, sans-serif', weight: "800" },
+  { name: "Soft Typewriter", font: '"Courier New", Courier, monospace', weight: "700" },
+  { name: "Rounded Display", font: '"Century Gothic", "Trebuchet MS", sans-serif', weight: "800" },
+  { name: "Elegant Serif", font: 'Baskerville, "Baskerville Old Face", Georgia, serif', weight: "700" },
+  { name: "Simple Cozy", font: 'Candara, Calibri, "Segoe UI", sans-serif', weight: "800" },
+  { name: "Chunky Friendly", font: 'Impact, "Arial Black", sans-serif', weight: "400" },
+  { name: "Soft UI", font: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif', weight: "800" },
+  { name: "Bookish Calm", font: 'Garamond, Georgia, serif', weight: "700" },
+  { name: "Logo Match", font: '"Trebuchet MS", Verdana, sans-serif', weight: "900" },
+  { name: "Cozy Marker", font: '"Marker Felt", "Comic Sans MS", cursive', weight: "800" },
+  { name: "Bright Humanist", font: '"Lucida Grande", "Lucida Sans Unicode", Verdana, sans-serif', weight: "800" },
+  { name: "Soft Newspaper", font: 'Constantia, Georgia, serif', weight: "700" },
+  { name: "Tiny Rounded", font: '"Arial Rounded MT Bold", Verdana, sans-serif', weight: "700" },
+  { name: "Friendly Book", font: '"Bookman Old Style", Georgia, serif', weight: "700" },
+  { name: "Fresh App", font: 'Calibri, Candara, "Segoe UI", sans-serif', weight: "800" },
+  { name: "Casual Bold", font: '"Comic Sans MS", "Arial Rounded MT Bold", cursive', weight: "900" },
+  { name: "Soft Luxury", font: 'Didot, "Bodoni 72", Georgia, serif', weight: "700" },
+  { name: "Clear Rounded", font: '"Lucida Sans", "Lucida Grande", Verdana, sans-serif', weight: "800" },
+  { name: "Cute Compact", font: '"Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif', weight: "800" },
+  { name: "Gentle Serif", font: '"Iowan Old Style", Palatino, Georgia, serif', weight: "700" },
+  { name: "Warm Sans", font: 'Corbel, Candara, "Segoe UI", sans-serif', weight: "800" },
+  { name: "Rounded Heavy", font: '"Arial Black", "Trebuchet MS", sans-serif', weight: "900" },
+  { name: "Soft Slab", font: 'Rockwell, "Courier New", serif', weight: "700" },
+  { name: "Simple Friendly", font: '"Helvetica Neue", Helvetica, Arial, sans-serif', weight: "800" },
+  { name: "Playful Print", font: '"Bradley Hand", "Comic Sans MS", cursive', weight: "800" },
+  { name: "Warm Classic", font: '"Hoefler Text", Baskerville, Georgia, serif', weight: "700" },
+  { name: "Balanced UI", font: '"Segoe UI Variable", "Segoe UI", system-ui, sans-serif', weight: "800" },
+  { name: "Cute Strong", font: '"Cooper Black", "Arial Black", "Trebuchet MS", sans-serif', weight: "800" },
+  { name: "Soft Notes", font: '"Noteworthy", "Comic Sans MS", cursive', weight: "800" },
+  { name: "Soft Script", font: '"Segoe Print", "Comic Sans MS", cursive', weight: "800" },
+  { name: "Rounded News", font: 'Charter, Georgia, serif', weight: "700" },
+  { name: "Clean Tablet", font: '"Noto Sans", "Segoe UI", system-ui, sans-serif', weight: "800" },
+  { name: "Friendly Screen", font: '"Ubuntu", "Trebuchet MS", sans-serif', weight: "800" },
+  { name: "Cute Journal", font: '"Chalkboard SE", "Comic Sans MS", cursive', weight: "800" },
+  { name: "Modern Rounded", font: '"Nunito", "Trebuchet MS", sans-serif', weight: "900" },
+  { name: "Soft Geometric", font: '"Futura", "Century Gothic", sans-serif', weight: "800" },
+  { name: "Warm Grotesk", font: '"Proxima Nova", "Avenir Next", sans-serif', weight: "800" },
+  { name: "Health Soft", font: '"Source Sans Pro", "Segoe UI", sans-serif', weight: "800" },
+  { name: "Cozy Sans", font: '"Lato", "Avenir Next", sans-serif', weight: "800" },
+  { name: "Playful Round", font: '"Quicksand", "Trebuchet MS", sans-serif', weight: "900" },
+  { name: "Fresh Rounded", font: '"Montserrat", "Century Gothic", sans-serif', weight: "800" },
+  { name: "Gentle UI", font: '"Open Sans", "Segoe UI", sans-serif', weight: "800" },
+  { name: "Soft Display", font: '"Poppins", "Trebuchet MS", sans-serif', weight: "900" },
+  { name: "Friendly Tall", font: '"Barlow", "Arial Narrow", sans-serif', weight: "800" },
+  { name: "Rounded Cozy", font: '"Varela Round", "Trebuchet MS", sans-serif', weight: "800" },
+  { name: "Cute Medical", font: '"M PLUS Rounded 1c", "Trebuchet MS", sans-serif', weight: "900" },
+  { name: "Calm Rounded", font: '"Comfortaa", "Trebuchet MS", sans-serif', weight: "900" },
+  { name: "Soft Organic", font: '"Josefin Sans", "Gill Sans", sans-serif', weight: "800" },
+  { name: "Warm Hand", font: '"Comic Neue", "Comic Sans MS", cursive', weight: "800" },
+  { name: "Peach Pop", font: '"Baloo 2", "Cooper Black", "Trebuchet MS", sans-serif', weight: "900" },
+  { name: "Cute Bounce", font: '"Fredoka", "Arial Rounded MT Bold", sans-serif', weight: "900" },
+  { name: "Soft Bubble", font: '"Chewy", "Cooper Black", cursive', weight: "800" },
+  { name: "Dreamy Serif", font: '"Fraunces", Georgia, serif', weight: "800" },
+  { name: "Tiny Charm", font: '"Space Grotesk", "Trebuchet MS", sans-serif', weight: "800" },
+  { name: "Cool Rounded", font: '"Sora", "Avenir Next", sans-serif', weight: "800" },
+  { name: "Happy Notes", font: '"Gaegu", "Comic Sans MS", cursive', weight: "800" },
+  { name: "Soft Clinic", font: '"DM Sans", "Avenir Next", sans-serif', weight: "900" },
+  { name: "Cute Retro", font: '"Recoleta", "Cooper Black", Georgia, serif', weight: "800" },
+  { name: "Rounded Baby", font: '"Sniglet", "Arial Rounded MT Bold", cursive', weight: "800" },
+  { name: "Cloud Sans", font: '"Manrope", "Segoe UI", sans-serif', weight: "800" },
+  { name: "Warm Display", font: '"Bricolage Grotesque", "Trebuchet MS", sans-serif', weight: "900" },
+  { name: "Mint Journal", font: '"Kalam", "Comic Sans MS", cursive', weight: "800" },
+  { name: "Orange Punch", font: '"Titan One", "Cooper Black", sans-serif', weight: "800" },
+  { name: "Soft Rounded Pro", font: '"Rubik", "Trebuchet MS", sans-serif', weight: "900" },
+  { name: "Sweet Serif", font: '"Cormorant Garamond", Garamond, serif', weight: "800" },
+  { name: "Cool Health", font: '"Urbanist", "Avenir Next", sans-serif', weight: "900" },
+  { name: "Play Date", font: '"Patrick Hand", "Comic Sans MS", cursive', weight: "800" },
+  { name: "Rounded Fresh", font: '"Plus Jakarta Sans", "Segoe UI", sans-serif', weight: "900" },
+  { name: "Soft Stamp", font: '"Bree Serif", Rockwell, serif', weight: "800" },
+  { name: "Little Blob", font: '"Lilita One", "Cooper Black", sans-serif', weight: "800" },
+  { name: "Cute Caps", font: '"League Spartan", "Arial Black", sans-serif', weight: "900", transform: "uppercase", spacing: "0.02em" },
+  { name: "Calm Chic", font: '"Playfair Display", Georgia, serif', weight: "800" },
+  { name: "Friendly Mono", font: '"Space Mono", "Courier New", monospace', weight: "700" },
+  { name: "Round Hug", font: '"Nunito Sans", "Trebuchet MS", sans-serif', weight: "900" },
+  { name: "Soft Groovy", font: '"Righteous", "Arial Rounded MT Bold", sans-serif', weight: "800" },
+  { name: "Pocket Diary", font: '"Handlee", "Comic Sans MS", cursive', weight: "800" },
+  { name: "Smooth App", font: '"Inter Tight", "Arial Narrow", sans-serif', weight: "900" },
+  { name: "Cute Calm", font: '"Mulish", "Avenir Next", sans-serif', weight: "900" },
+  { name: "Warm Human", font: '"Epilogue", "Avenir Next", sans-serif', weight: "900" },
+  { name: "Soft Curl", font: '"Yeseva One", Georgia, serif', weight: "800" },
+  { name: "Tiny Joy", font: '"Short Stack", "Comic Sans MS", cursive', weight: "800" },
+  { name: "Rounded Tech", font: '"Outfit", "Segoe UI", sans-serif', weight: "900" },
+  { name: "Sweet Bold", font: '"Paytone One", "Cooper Black", sans-serif', weight: "800" },
+  { name: "Care Label", font: '"Work Sans", "Avenir Next", sans-serif', weight: "900" },
+  { name: "Soft Italic", font: '"Libre Baskerville", Georgia, serif', weight: "700", style: "italic" },
+  { name: "Cool Cute", font: '"Archivo Rounded", "Arial Rounded MT Bold", sans-serif', weight: "900" },
+  { name: "Handmade", font: '"Coming Soon", "Comic Sans MS", cursive', weight: "800" },
+  { name: "Rounded Logo", font: '"DynaPuff", "Cooper Black", cursive', weight: "800" },
+  { name: "Fresh Cute", font: '"Lexend", "Trebuchet MS", sans-serif', weight: "900" },
+];
 
 function App() {
   const [data, setData] = useState<AppData>(() => loadData());
@@ -95,6 +197,10 @@ function App() {
   const addWater = (amountMl: number) => {
     setData((current) => ({ ...current, waterLogs: [...current.waterLogs, { id: uid("water"), amountMl, loggedAt: new Date().toISOString() }] }));
   };
+
+  if (new URLSearchParams(window.location.search).has("fonts") || window.location.hash === "#fonts") {
+    return <FontStylesPage />;
+  }
 
   if (stage === "landing") {
     return <LandingPage onEnter={() => setStage("app")} />;
@@ -167,9 +273,45 @@ function LandingPage({ onEnter }: { onEnter: () => void }) {
         <h1>Understand your body patterns.</h1>
         <p className="landing-copy">Track food, water, workouts, symptoms, and mood in one calm daily loop.</p>
         <div className="landing-actions">
-          <button className="button landing-button" onClick={onEnter}>Sign up <ArrowRight size={18} /></button>
-          <button className="button ghost landing-button" onClick={onEnter}>Continue <ArrowRight size={18} /></button>
+          <button className="button landing-button" onClick={onEnter}>Start tracking <ArrowRight size={18} /></button>
         </div>
+      </section>
+    </main>
+  );
+}
+
+function FontStylesPage() {
+  return (
+    <main className="font-page">
+      <header className="font-page-header">
+        <img src="/LOGOTWINGE-transparent.png" alt="Twinge logo" />
+        <div>
+          <p className="eyebrow">Choose a landing font</p>
+          <h1>100 font styles for Twinge</h1>
+          <p>Pick the number that feels cutest with the logo.</p>
+        </div>
+        <a className="button ghost" href="/">Back</a>
+      </header>
+      <section className="font-grid">
+        {fontOptions.map((option, index) => (
+          <article
+            className="font-card"
+            key={option.name}
+            style={{
+              ["--preview-font" as string]: option.font,
+              ["--preview-weight" as string]: option.weight,
+              ["--preview-spacing" as string]: "spacing" in option ? option.spacing : "0",
+              ["--preview-transform" as string]: "transform" in option ? option.transform : "none",
+              ["--preview-style" as string]: "style" in option ? option.style : "normal",
+            }}
+          >
+            <span className="font-number">{String(index + 1).padStart(2, "0")}</span>
+            <img src="/LOGOTWINGE-transparent.png" alt="" />
+            <small>{option.name}</small>
+            <h2>Understand your body patterns.</h2>
+            <p>Track food, water, workouts, symptoms, and mood in one calm daily loop.</p>
+          </article>
+        ))}
       </section>
     </main>
   );

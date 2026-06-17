@@ -2032,3 +2032,289 @@ h3,
   font-weight: 800;
   letter-spacing: 0.14em;
 }
+
+/* Landing atmosphere: let the orange logo carry the page. */
+.landing {
+  background:
+    linear-gradient(180deg, rgba(255, 248, 242, 0.78), rgba(212, 234, 232, 0) 34%),
+    linear-gradient(135deg, #d4eae8 0%, #e6f2f0 48%, #fff8f2 100%);
+}
+
+.landing::before {
+  content: none;
+}
+
+.landing-card {
+  width: min(720px, 100%);
+}
+
+.landing-mark {
+  width: clamp(150px, 19vw, 230px);
+  height: clamp(142px, 18vw, 220px);
+  margin-bottom: 6px;
+}
+
+.landing .eyebrow {
+  margin-bottom: 14px;
+  color: rgba(36, 107, 99, 0.7);
+}
+
+.landing h1 {
+  max-width: 700px;
+  color: #246b63;
+  font-family: "Trebuchet MS", "Avenir Next", Avenir, "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(44px, 5.4vw, 68px);
+  font-weight: 900;
+  line-height: 0.94;
+  letter-spacing: 0;
+}
+
+.landing-copy {
+  max-width: 560px;
+  color: rgba(36, 107, 99, 0.9);
+  font-family: "Avenir Next", Avenir, "Trebuchet MS", "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(18px, 1.65vw, 22px);
+  font-weight: 750;
+  line-height: 1.24;
+  letter-spacing: 0;
+  margin-bottom: 26px;
+}
+
+.landing-actions {
+  margin-top: 4px;
+}
+
+.landing-button {
+  border-radius: 10px;
+}
+
+/* Landing button treatment. */
+.landing-actions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.landing-button {
+  position: relative;
+  min-width: 224px;
+  min-height: 60px;
+  padding: 0 18px 0 30px;
+  border-radius: 999px;
+  font-size: 17px;
+  font-weight: 900;
+  letter-spacing: 0;
+  justify-content: space-between;
+}
+
+.landing-button:not(.ghost) {
+  color: #246b63;
+  background:
+    linear-gradient(135deg, rgba(255, 248, 242, 0.72), rgba(212, 234, 232, 0.42)),
+    rgba(255, 248, 242, 0.34);
+  border-color: rgba(255, 248, 242, 0.72);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.72),
+    inset 0 -1px 0 rgba(36, 107, 99, 0.08);
+  backdrop-filter: blur(18px) saturate(1.18);
+}
+
+.landing-button.ghost {
+  color: #246b63;
+  background: rgba(255, 248, 242, 0.72);
+  border-color: rgba(36, 107, 99, 0.18);
+  box-shadow:
+    0 14px 26px rgba(36, 107, 99, 0.08),
+    inset 0 -2px 0 rgba(36, 107, 99, 0.06);
+}
+
+.landing-button svg {
+  width: 30px;
+  height: 30px;
+  margin-left: 8px;
+  padding: 7px;
+  border-radius: 999px;
+  transition: transform 180ms ease, background 180ms ease;
+}
+
+.landing-button:not(.ghost) svg {
+  color: #fff8f2;
+  background: #ff4610;
+}
+
+.landing-button.ghost svg {
+  color: #fff8f2;
+  background: #246b63;
+}
+
+.landing-button:hover {
+  transform: translateY(-2px);
+}
+
+.landing-button:not(.ghost):hover {
+  background:
+    linear-gradient(135deg, rgba(255, 248, 242, 0.86), rgba(212, 234, 232, 0.54)),
+    rgba(255, 248, 242, 0.46);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.86),
+    inset 0 -1px 0 rgba(36, 107, 99, 0.1);
+}
+
+.landing-button.ghost:hover {
+  background: rgba(255, 248, 242, 0.96);
+  box-shadow:
+    0 16px 30px rgba(36, 107, 99, 0.12),
+    inset 0 -2px 0 rgba(36, 107, 99, 0.06);
+}
+
+.landing-button:hover svg {
+  transform: translateX(2px);
+}
+
+@media (max-width: 540px) {
+  .landing-actions {
+    width: 100%;
+  }
+
+  .landing-button {
+    width: 100%;
+  }
+}
+
+.font-page {
+  width: 100%;
+  min-height: 100vh;
+  padding: clamp(22px, 4vw, 52px);
+  background:
+    linear-gradient(180deg, rgba(255, 248, 242, 0.82), rgba(212, 234, 232, 0) 36%),
+    linear-gradient(135deg, #d4eae8 0%, #e6f2f0 50%, #fff8f2 100%);
+}
+
+.font-page-header {
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: center;
+  max-width: 1220px;
+  margin: 0 auto 24px;
+}
+
+.font-page-header img {
+  width: 120px;
+  height: 112px;
+  object-fit: contain;
+}
+
+.font-page-header h1 {
+  margin-bottom: 4px;
+  color: #246b63;
+  font-family: "Trebuchet MS", "Avenir Next", Avenir, sans-serif;
+  font-size: clamp(34px, 4vw, 58px);
+  line-height: 0.96;
+}
+
+.font-page-header p:not(.eyebrow) {
+  margin: 0;
+  color: rgba(36, 107, 99, 0.78);
+  font-weight: 750;
+}
+
+.font-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  max-width: 1220px;
+  margin: 0 auto;
+}
+
+.font-card {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  min-height: 342px;
+  padding: 18px 16px 20px;
+  overflow: hidden;
+  color: #246b63;
+  background: rgba(255, 248, 242, 0.54);
+  border: 1px solid rgba(36, 107, 99, 0.13);
+  border-radius: 14px;
+  box-shadow: 0 16px 34px rgba(36, 107, 99, 0.08);
+  text-align: center;
+}
+
+.font-number {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 28px;
+  color: #fff8f2;
+  background: #ff4610;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.font-card img {
+  width: 96px;
+  height: 90px;
+  margin-bottom: 8px;
+  object-fit: contain;
+}
+
+.font-card small {
+  margin-bottom: 10px;
+  color: rgba(36, 107, 99, 0.72);
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.font-card h2 {
+  display: block;
+  margin: 0 0 10px;
+  color: #246b63;
+  font-family: var(--preview-font);
+  font-size: clamp(28px, 3vw, 42px);
+  font-weight: var(--preview-weight);
+  font-style: var(--preview-style, normal);
+  line-height: 0.96;
+  letter-spacing: var(--preview-spacing, 0);
+  text-transform: var(--preview-transform, none);
+}
+
+.font-card p {
+  max-width: 260px;
+  margin: 0;
+  color: rgba(36, 107, 99, 0.9);
+  font-family: var(--preview-font);
+  font-size: 17px;
+  font-weight: var(--preview-weight);
+  font-style: var(--preview-style, normal);
+  line-height: 1.2;
+}
+
+@media (max-width: 1080px) {
+  .font-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 680px) {
+  .font-page-header,
+  .font-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .font-page-header {
+    justify-items: start;
+  }
+}
