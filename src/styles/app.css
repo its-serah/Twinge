@@ -2105,14 +2105,15 @@ h3,
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  min-width: 224px;
+  width: 256px;
+  min-width: 256px;
   min-height: 60px;
-  padding: 0 18px 0 30px;
+  padding: 0 58px;
   border-radius: 999px;
   font-size: 17px;
   font-weight: 900;
   letter-spacing: 0;
-  justify-content: space-between;
+  justify-content: center;
   transition: transform 180ms ease, background 180ms ease;
 }
 
@@ -2164,10 +2165,12 @@ h3,
   position: relative;
   z-index: 1;
   display: inline-block;
+  text-align: center;
 }
 
 .landing-arrow-chip {
-  position: relative;
+  position: absolute;
+  left: 14px;
   z-index: 1;
   display: grid;
   place-items: center;
@@ -2225,11 +2228,12 @@ h3,
 }
 
 .landing-button:hover .landing-arrow-chip {
-  transform: translateX(2px);
+  transform: translateX(3px);
 }
 
 .landing-button:disabled {
   cursor: default;
+  opacity: 1;
 }
 
 .landing-button.launching {
@@ -2238,11 +2242,11 @@ h3,
 }
 
 .landing-button.launching .landing-button-label {
-  animation: labelPop 640ms cubic-bezier(0.19, 1, 0.22, 1) both;
+  animation: labelPop 680ms cubic-bezier(0.19, 1, 0.22, 1) 160ms both;
 }
 
 .landing-button.launching .landing-arrow-chip {
-  animation: swipeArrow 680ms cubic-bezier(0.19, 1, 0.22, 1) forwards;
+  animation: swipeArrow 700ms cubic-bezier(0.19, 1, 0.22, 1) forwards;
 }
 
 @keyframes glassSweep {
@@ -2270,18 +2274,21 @@ h3,
 
 @keyframes swipeArrow {
   0% {
+    left: 14px;
     opacity: 1;
     transform: translateX(0) scale(1);
   }
 
-  62% {
+  72% {
+    left: calc(100% - 44px);
     opacity: 1;
-    transform: translateX(58px) scale(1.04);
+    transform: translateX(0) scale(1.04);
   }
 
   100% {
-    opacity: 0;
-    transform: translateX(78px) scale(0.72);
+    left: calc(100% - 44px);
+    opacity: 1;
+    transform: translateX(0) scale(1);
   }
 }
 
@@ -2315,6 +2322,7 @@ h3,
 
   .landing-button {
     width: 100%;
+    min-width: 0;
   }
 }
 
