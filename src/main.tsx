@@ -453,6 +453,7 @@ function OnboardingPage({ data, setData, onDone }: { data: AppData; setData: Rea
   return (
     <main className="onboarding-shell">
       <section className="onboarding-card guided-card">
+        <div className="onboarding-mark"><img src="/LOGOTWINGE-transparent.png" alt="Twinge logo" /></div>
         <div className="step-progress" aria-label={`Step ${step + 1} of ${steps.length}`}>
           {steps.map((item, index) => <span key={item.eyebrow} className={index <= step ? "active" : ""} />)}
         </div>

@@ -2863,6 +2863,242 @@ textarea {
   }
 }
 
+/* Guided setup: visually continue the landing screen. */
+.onboarding-shell {
+  position: relative;
+  overflow: hidden;
+  align-items: center;
+  min-height: 100vh;
+  padding: clamp(28px, 5vw, 72px);
+  background:
+    linear-gradient(180deg, rgba(255, 248, 242, 0.78), rgba(212, 234, 232, 0) 34%),
+    linear-gradient(135deg, #d4eae8 0%, #e6f2f0 48%, #fff8f2 100%);
+}
+
+.guided-card {
+  justify-items: center;
+  width: min(720px, 100%);
+  min-height: auto;
+  padding: 0;
+  color: #246b63;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  text-align: center;
+  backdrop-filter: none;
+}
+
+.onboarding-mark {
+  width: clamp(118px, 15vw, 176px);
+  height: clamp(112px, 14vw, 168px);
+  margin-bottom: 10px;
+}
+
+.onboarding-mark img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.guided-card .step-progress {
+  width: min(360px, 100%);
+  gap: 7px;
+  margin: 0 0 18px;
+}
+
+.guided-card .step-progress span {
+  height: 7px;
+  background: rgba(255, 255, 255, 0.38);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.56);
+}
+
+.guided-card .step-progress span.active {
+  background: #ff4610;
+  border-color: #ff4610;
+  box-shadow: none;
+}
+
+.guided-card .eyebrow {
+  margin-bottom: 12px;
+  color: rgba(36, 107, 99, 0.7);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+}
+
+.guided-card h1 {
+  max-width: 680px;
+  margin: 0 auto 28px;
+  color: #246b63;
+  font-family: "Trebuchet MS", "Avenir Next", Avenir, "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(42px, 5.4vw, 66px);
+  font-weight: 900;
+  line-height: 0.94;
+  letter-spacing: 0;
+  text-wrap: balance;
+}
+
+.guided-card .guided-step {
+  justify-items: center;
+  width: min(560px, 100%);
+  min-height: 0;
+  margin-bottom: 24px;
+}
+
+.guided-card .single-field {
+  width: min(430px, 100%);
+  color: rgba(36, 107, 99, 0.72);
+  text-align: left;
+}
+
+.guided-card .single-field input,
+.guided-card input,
+.guided-card select,
+.guided-card textarea {
+  min-height: 62px;
+  color: #246b63;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.45), rgba(212, 234, 232, 0.2)),
+    rgba(255, 255, 255, 0.16);
+  border: 2px solid rgba(255, 255, 255, 0.62);
+  border-radius: 999px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.88),
+    inset 0 -1px 0 rgba(36, 107, 99, 0.08);
+  backdrop-filter: blur(22px) saturate(1.18);
+  font-size: 22px;
+  font-weight: 900;
+  text-align: center;
+}
+
+.guided-card .choice-stack,
+.guided-card .choice-grid,
+.guided-card .onboarding-foods.guided {
+  width: min(560px, 100%);
+  gap: 12px;
+}
+
+.guided-card .choice-grid,
+.guided-card .onboarding-foods.guided {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.guided-card .choice-card,
+.guided-card .onboarding-chip {
+  position: relative;
+  justify-content: center;
+  min-height: 64px;
+  padding: 14px 18px;
+  color: #246b63;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.42), rgba(212, 234, 232, 0.18)),
+    rgba(255, 255, 255, 0.14);
+  border: 2px solid rgba(255, 255, 255, 0.62);
+  border-radius: 999px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.82),
+    inset 0 -1px 0 rgba(36, 107, 99, 0.08);
+  backdrop-filter: blur(24px) saturate(1.2);
+  font-size: 17px;
+  font-weight: 900;
+  text-align: center;
+}
+
+.guided-card .choice-card svg,
+.guided-card .onboarding-chip svg {
+  color: #ff4610;
+}
+
+.guided-card .choice-card.active,
+.guided-card .onboarding-chip.active {
+  color: #fff8f2;
+  background: #ff4610;
+  border-color: #ff4610;
+  box-shadow: 0 14px 26px rgba(255, 70, 16, 0.18);
+}
+
+.guided-card .choice-card.active svg,
+.guided-card .onboarding-chip.active svg {
+  color: #fff8f2;
+}
+
+.guided-card .choice-card:hover,
+.guided-card .onboarding-chip:hover {
+  transform: translateY(-2px);
+}
+
+.guided-card .guided-actions {
+  width: min(420px, 100%);
+  margin-top: 0;
+}
+
+.guided-card .guided-actions .button {
+  justify-self: stretch;
+}
+
+.guided-card .button:not(.landing-button) {
+  min-height: 54px;
+  padding: 0 24px;
+  border-radius: 999px;
+  font-size: 16px;
+}
+
+.guided-card .button.ghost {
+  color: #246b63;
+  background: rgba(255, 248, 242, 0.4);
+  border: 2px solid rgba(255, 255, 255, 0.62);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.78),
+    inset 0 -1px 0 rgba(36, 107, 99, 0.08);
+}
+
+.guided-card .button:disabled {
+  opacity: 0.42;
+}
+
+@media (max-width: 620px) {
+  .onboarding-shell {
+    padding: 26px 18px;
+  }
+
+  .guided-card {
+    width: 100%;
+    min-height: 0;
+  }
+
+  .onboarding-mark {
+    width: 126px;
+    height: 120px;
+  }
+
+  .guided-card h1 {
+    font-size: clamp(40px, 14vw, 60px);
+  }
+
+  .guided-card .choice-grid,
+  .guided-card .onboarding-foods.guided {
+    grid-template-columns: 1fr;
+  }
+
+  .guided-card .guided-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .guided-card .button:not(.landing-button) {
+    width: 100%;
+  }
+
+  .guided-card .guided-actions .button:only-child {
+    grid-column: 1 / -1;
+    justify-self: center;
+    width: min(190px, 100%);
+  }
+}
+
 @media (max-width: 620px) {
   .app h1 {
     font-size: clamp(26px, 9vw, 36px);
