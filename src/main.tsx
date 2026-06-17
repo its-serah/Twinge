@@ -104,7 +104,7 @@ function App() {
     <div className="app">
       <aside className="sidebar">
         <div className="brand">
-          <div className="brand-mark"><img src="/LOGOTWINGE.jpg" alt="Twinge logo" /></div>
+          <div className="brand-mark"><img src="/LOGOTWINGE-transparent.png" alt="Twinge logo" /></div>
           <div>
             <strong>twinge.</strong>
             <span>feel it. track it.</span>
@@ -162,10 +162,10 @@ function LandingPage({ onEnter }: { onEnter: () => void }) {
   return (
     <main className="landing">
       <section className="landing-card">
-        <div className="landing-mark"><img src="/LOGOTWINGE.jpg" alt="Twinge logo" /></div>
+        <div className="landing-mark"><img src="/LOGOTWINGE-transparent.png" alt="Twinge logo" /></div>
         <p className="eyebrow">feel it. track it. understand it.</p>
-        <h1>twinge.</h1>
-        <p className="landing-copy">A soft little home for food, water, workouts, symptoms, mood, and the patterns your body keeps trying to tell you.</p>
+        <h1>Understand your body patterns.</h1>
+        <p className="landing-copy">Track food, water, workouts, symptoms, and mood in one calm daily loop.</p>
         <div className="landing-actions">
           <button className="button landing-button" onClick={onEnter}>Sign up <ArrowRight size={18} /></button>
           <button className="button ghost landing-button" onClick={onEnter}>Continue <ArrowRight size={18} /></button>
