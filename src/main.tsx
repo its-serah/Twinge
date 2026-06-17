@@ -270,7 +270,7 @@ function LandingPage({ onEnter }: { onEnter: () => void }) {
   const startTracking = () => {
     if (launching) return;
     setLaunching(true);
-    window.setTimeout(onEnter, 1280);
+    window.setTimeout(onEnter, 1540);
   };
 
   return (
