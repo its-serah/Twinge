@@ -278,8 +278,8 @@ function LandingPage({ onEnter }: { onEnter: () => void }) {
       <section className="landing-card">
         <div className="landing-mark"><img src="/LOGOTWINGE-transparent.png" alt="Twinge logo" /></div>
         <p className="eyebrow">feel it. track it. understand it.</p>
-        <h1>Understand your body patterns.</h1>
-        <p className="landing-copy">Track food, water, workouts, symptoms, and mood in one calm daily loop.</p>
+        <h1>Tune into what your body is saying.</h1>
+        <p className="landing-copy">Log meals, movement, mood, and symptoms so your daily patterns start making sense.</p>
         <div className="landing-actions">
           <button className={launching ? "button landing-button launching" : "button landing-button"} onClick={startTracking} disabled={launching}>
             <span className="landing-arrow-chip"><img src="/slider-icon.png" alt="" /></span>
