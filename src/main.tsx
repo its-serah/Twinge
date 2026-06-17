@@ -265,6 +265,14 @@ function App() {
 
 
 function LandingPage({ onEnter }: { onEnter: () => void }) {
+  const [launching, setLaunching] = useState(false);
+
+  const startTracking = () => {
+    if (launching) return;
+    setLaunching(true);
+    window.setTimeout(onEnter, 760);
+  };
+
   return (
     <main className="landing">
       <section className="landing-card">
@@ -273,7 +281,10 @@ function LandingPage({ onEnter }: { onEnter: () => void }) {
         <h1>Understand your body patterns.</h1>
         <p className="landing-copy">Track food, water, workouts, symptoms, and mood in one calm daily loop.</p>
         <div className="landing-actions">
-          <button className="button landing-button" onClick={onEnter}>Start tracking <ArrowRight size={18} /></button>
+          <button className={launching ? "button landing-button launching" : "button landing-button"} onClick={startTracking} disabled={launching}>
+            <span className="landing-button-label">Start tracking</span>
+            <span className="landing-arrow-chip"><ArrowRight size={18} /></span>
+          </button>
         </div>
       </section>
     </main>
