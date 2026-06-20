@@ -206,7 +206,10 @@ function App() {
   }
 
   if (stage === "landing") {
-    return <LandingPage onEnter={() => setStage("onboarding")} />;
+    return <LandingPage onEnter={() => {
+      setActive("Dashboard");
+      setStage("app");
+    }} />;
   }
 
   if (stage === "onboarding") {
@@ -235,7 +238,7 @@ function App() {
         <header className="topbar">
           <div>
             <p className="eyebrow">{new Date().toLocaleDateString(undefined, { weekday: "long", month: "short", day: "numeric" })}</p>
-            <h1>{active === "Today" ? `Hey ${data.profile.name || "Sarah"}, what are we eating?` : active === "Dashboard" ? `Hi ${data.profile.name || "there"}, here's your body board.` : active}</h1>
+            <h1>{active === "Today" ? `Hey ${data.profile.name || "Sarah"}, what are we eating?` : active === "Dashboard" ? "Pick what to log." : active}</h1>
           </div>
           <div className="top-actions">
             <span className="status-pill"><Flame size={15} /> {totals.calories}/{data.profile.calorieGoal}</span>
@@ -272,14 +275,6 @@ function App() {
 
 
 function LandingPage({ onEnter }: { onEnter: () => void }) {
-  const [launching, setLaunching] = useState(false);
-
-  const startTracking = () => {
-    if (launching) return;
-    setLaunching(true);
-    window.setTimeout(onEnter, 1540);
-  };
-
   return (
     <main className="landing">
       <section className="landing-card">
@@ -288,9 +283,8 @@ function LandingPage({ onEnter }: { onEnter: () => void }) {
         <h1>Tune into what your body is saying.</h1>
         <p className="landing-copy">Log meals, movement, mood, and symptoms so your daily patterns start making sense.</p>
         <div className="landing-actions">
-          <button className={launching ? "button landing-button launching" : "button landing-button"} onClick={startTracking} disabled={launching}>
-            <span className="landing-arrow-chip"><img src="/slider-icon.png" alt="" /></span>
-            <span className="landing-button-label">Start tracking</span>
+          <button className="button landing-button start-button" onClick={onEnter}>
+            Start tracking <ArrowRight size={18} />
           </button>
         </div>
       </section>
@@ -613,145 +607,42 @@ function Dashboard(props: {
   setActive: (tab: string) => void;
   addWater: (amountMl: number) => void;
 }) {
-  const { data, totals, todayWaterMl, todaySteps, todayMental, trends } = props;
+  const { data, totals, todayWaterMl, todaySteps, todayMental } = props;
   const waterGlasses = Math.round(todayWaterMl / 250);
   const symptoms = data.symptomLogs.filter((log) => log.loggedAt.startsWith(todayKey()));
-  const streak = lastDays(7).filter((date) => (data.stepLogs.find((log) => log.date === date)?.stepCount ?? 0) >= data.profile.stepGoal).length;
-  const readiness = Math.round((((todayMental?.mood ?? 5) + (todayMental?.energy ?? 5)) / 20) * 100);
-  const twingeScore = getTwingeScore(data, totals, todayWaterMl, todaySteps, todayMental);
-  const recoveryMode = symptoms.some((symptom) => symptom.severity >= 7) || (todayMental?.energy ?? 10) <= 3 || (todayMental?.sleepHours ?? 8) < 5.5;
-  const insights = getPatternInsights(data);
-  const timeline = getDailyTimeline(data);
-  const weeklyStory = getWeeklyStory(data);
-  const journey = [
-    { label: "Check in", detail: todayMental ? `${todayMental.mood}/10 mood` : "Mood, energy, sleep", done: Boolean(todayMental), action: "Check-in", icon: <Brain size={18} /> },
-    { label: "Fuel", detail: `${totals.calories} kcal logged`, done: totals.calories > 0, action: "Food", icon: <Apple size={18} /> },
-    { label: "Hydrate", detail: `${waterGlasses}/${data.profile.waterGoal} glasses`, done: waterGlasses >= data.profile.waterGoal, action: "Dashboard", icon: <Droplets size={18} /> },
-    { label: "Move", detail: `${todaySteps.toLocaleString()} steps`, done: todaySteps >= data.profile.stepGoal, action: "Gym", icon: <Footprints size={18} /> },
+  const actions = [
+    { label: "Food", detail: "Meals, calories, protein, and how it felt.", action: "Food", icon: <Apple size={20} />, stat: `${totals.calories} kcal today` },
+    { label: "Mood", detail: "Mood, energy, sleep, journal, and steps.", action: "Check-in", icon: <Brain size={20} />, stat: todayMental ? `${todayMental.mood}/10 mood` : "Not checked in" },
+    { label: "Pain", detail: "Symptoms, body location, severity, and notes.", action: "Symptoms", icon: <HeartPulse size={20} />, stat: `${symptoms.length} logged today` },
+    { label: "Gym", detail: "Workout type, exercises, sets, reps, and notes.", action: "Gym", icon: <Dumbbell size={20} />, stat: `${todaySteps.toLocaleString()} steps` },
   ];
 
   return (
-    <section className="stack">
-      <div className="hero-panel">
-        <div className="hero-copy">
-          <p className="eyebrow">Your gentle health loop</p>
-          <h2>{recoveryMode ? "Recovery mode" : `${twingeScore}% twinge score`}</h2>
-          <p>{recoveryMode ? "Today looks like a lower-capacity day. Keep the loop focused on hydration, sleep, and gentle notes." : "Start with a check-in, log what matters, then watch your daily rhythm come together."}</p>
-          <div className="hero-tags">
-            <span>{totals.protein}g protein</span>
-            <span>{totals.fiber}g fiber</span>
-            <span>{symptoms.length} symptoms</span>
-          </div>
-        </div>
-        <div className="readiness-dial" style={{ ["--score" as string]: `${recoveryMode ? Math.max(20, readiness - 15) : twingeScore}%` }}>
-          <strong>{moodEmoji(todayMental?.mood ?? 5)}</strong>
-          <span>{todayMental?.sleepHours ?? 0}h sleep</span>
-        </div>
+    <section className="dashboard-choice">
+      <div className="choice-intro">
+        <p className="eyebrow">Today</p>
+        <h2>What do you want to fill in?</h2>
+        <p>Pick one thing. No giant dashboard, no forced setup. Log the part you care about right now.</p>
       </div>
 
-      {recoveryMode && (
-        <Panel title="Recovery focus" icon={<HeartPulse size={18} />}>
-          <div className="recovery-grid">
-            <span>Hydrate steadily</span>
-            <span>Keep movement light</span>
-            <span>Follow up on pain tomorrow</span>
-            <span>Prioritize sleep tonight</span>
-          </div>
-        </Panel>
-      )}
-
-      <div className="journey">
-        {journey.map((step, index) => (
-          <button key={step.label} className={step.done ? "journey-step done" : "journey-step"} onClick={() => step.action === "Dashboard" ? props.addWater(250) : props.setActive(step.action)}>
-            <span className="journey-number">{step.done ? <CheckCircle2 size={18} /> : index + 1}</span>
-            <span className="journey-icon">{step.icon}</span>
-            <strong>{step.label}</strong>
-            <small>{step.detail}</small>
+      <div className="choice-actions">
+        {actions.map((item) => (
+          <button key={item.label} className="choice-action" onClick={() => props.setActive(item.action)}>
+            <span className="choice-action-icon">{item.icon}</span>
+            <span>
+              <strong>{item.label}</strong>
+              <small>{item.detail}</small>
+            </span>
+            <em>{item.stat}</em>
           </button>
         ))}
       </div>
 
-      <div className="metrics">
-        <Metric icon={<Flame />} label="Calories" value={`${totals.calories}`} detail={`${data.profile.calorieGoal} kcal goal`} progress={totals.calories / data.profile.calorieGoal} />
-        <Metric icon={<Footprints />} label="Steps" value={todaySteps.toLocaleString()} detail={`${streak} goal days this week`} progress={todaySteps / data.profile.stepGoal} />
-        <Metric icon={<Droplets />} label="Water" value={`${waterGlasses}/${data.profile.waterGoal}`} detail={`${todayWaterMl} ml logged`} progress={waterGlasses / data.profile.waterGoal} />
-        <Metric icon={<Brain />} label="Mood" value={todayMental ? `${moodEmoji(todayMental.mood)} ${todayMental.mood}/10` : "No check-in"} detail={`${todayMental?.sleepHours ?? 0}h sleep`} progress={(todayMental?.mood ?? 0) / 10} />
+      <div className="today-strip">
+        <span><Flame size={16} /> {totals.calories}/{data.profile.calorieGoal} kcal</span>
+        <button onClick={() => props.addWater(250)}><Droplets size={16} /> Add water ({waterGlasses}/{data.profile.waterGoal})</button>
+        <span><Footprints size={16} /> {todaySteps.toLocaleString()} steps</span>
       </div>
-
-      <div className="grid two">
-        <Panel title="Pattern detective" icon={<Sparkles size={18} />}>
-          <div className="insight-grid">
-            {insights.map((insight) => (
-              <article key={insight.title} className="insight-card">
-                <strong>{insight.title}</strong>
-                <p>{insight.copy}</p>
-              </article>
-            ))}
-          </div>
-        </Panel>
-        <Panel title="Weekly body story" icon={<CalendarDays size={18} />}>
-          <div className="story-card">
-            <strong>{weeklyStory.title}</strong>
-            <p>{weeklyStory.copy}</p>
-          </div>
-        </Panel>
-      </div>
-
-      <Panel title="Cause-and-effect timeline" icon={<Clock size={18} />}>
-        <div className="timeline">
-          {timeline.length ? timeline.map((item) => (
-            <article key={`${item.time}-${item.detail}`} className={`timeline-item ${item.kind}`}>
-              <span>{item.time}</span>
-              <strong>{item.label}</strong>
-              <p>{item.detail}</p>
-            </article>
-          )) : <p className="empty-note">No timeline entries yet today.</p>}
-        </div>
-      </Panel>
-
-      <div className="quick-strip">
-        <button onClick={() => props.setActive("Food")}><Apple size={18} /> Food</button>
-        <button onClick={() => props.addWater(250)}><Droplets size={18} /> +250ml</button>
-        <button onClick={() => props.setActive("Gym")}><Dumbbell size={18} /> Workout</button>
-        <button onClick={() => props.setActive("Symptoms")}><Wand2 size={18} /> Symptom</button>
-      </div>
-
-      <div className="grid two">
-        <Panel title="7-day movement" icon={<BarChart3 size={18} />}>
-          <ResponsiveContainer width="100%" height={220}>
-            <BarChart data={trends}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} />
-              <XAxis dataKey="day" />
-              <YAxis hide />
-              <Tooltip />
-              <Bar dataKey="steps" fill="#ff4610" radius={[6, 6, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </Panel>
-        <Panel title="Mood, energy, sleep" icon={<Sparkles size={18} />}>
-          <ResponsiveContainer width="100%" height={220}>
-            <LineChart data={trends}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} />
-              <XAxis dataKey="day" />
-              <YAxis domain={[0, 10]} />
-              <Tooltip />
-              <Line dataKey="mood" stroke="#ff4610" strokeWidth={3} />
-              <Line dataKey="energy" stroke="#246b63" strokeWidth={3} />
-              <Line dataKey="sleep" stroke="#d4eae8" strokeWidth={3} />
-            </LineChart>
-          </ResponsiveContainer>
-        </Panel>
-      </div>
-
-      {symptoms.length > 0 && (
-        <Panel title="Today's symptom notes" icon={<HeartPulse size={18} />}>
-          <div className="inline-list">
-            {symptoms.map((symptom) => (
-              <span key={symptom.id}>{symptom.bodyLocation}: {symptom.type.toLowerCase()} {symptom.severity}/10</span>
-            ))}
-          </div>
-        </Panel>
-      )}
     </section>
   );
 }
