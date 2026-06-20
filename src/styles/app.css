@@ -3175,3 +3175,613 @@ textarea {
     font-size: 16px;
   }
 }
+
+/* Ultra polish layer: one coherent product UI over the earlier experiments. */
+:root {
+  --ui-bg: #eef8f5;
+  --ui-bg-warm: #fff6ef;
+  --ui-surface: rgba(255, 255, 255, 0.72);
+  --ui-surface-strong: rgba(255, 255, 255, 0.92);
+  --ui-ink: #174f49;
+  --ui-ink-soft: rgba(23, 79, 73, 0.68);
+  --ui-ink-faint: rgba(23, 79, 73, 0.48);
+  --ui-accent: #ff4610;
+  --ui-accent-soft: rgba(255, 70, 16, 0.1);
+  --ui-line: rgba(23, 79, 73, 0.12);
+  --ui-line-bright: rgba(255, 255, 255, 0.82);
+  --ui-shadow: 0 22px 60px rgba(23, 79, 73, 0.1);
+  --ui-shadow-soft: 0 12px 28px rgba(23, 79, 73, 0.07);
+  color: var(--ui-ink);
+  background: var(--ui-bg);
+}
+
+html,
+body {
+  color: var(--ui-ink);
+  background:
+    linear-gradient(180deg, rgba(255, 246, 239, 0.82), rgba(238, 248, 245, 0) 38%),
+    linear-gradient(135deg, #e0f1ee 0%, #f5fbf8 52%, #fff8f2 100%);
+}
+
+body {
+  font-family: "Avenir Next", Avenir, "Trebuchet MS", "Segoe UI", system-ui, sans-serif;
+}
+
+button {
+  transition: transform 160ms ease, border-color 160ms ease, background 160ms ease, box-shadow 160ms ease;
+}
+
+button:hover {
+  transform: translateY(-1px);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+.landing,
+.onboarding-shell {
+  min-height: 100vh;
+  min-height: 100dvh;
+  background:
+    linear-gradient(180deg, rgba(255, 246, 239, 0.84), rgba(238, 248, 245, 0) 40%),
+    linear-gradient(135deg, #e0f1ee 0%, #f7fbf8 54%, #fff6ef 100%);
+}
+
+.landing-card,
+.guided-card {
+  width: min(760px, 100%);
+}
+
+.landing-mark {
+  width: clamp(136px, 17vw, 210px);
+  height: clamp(128px, 16vw, 200px);
+}
+
+.landing .eyebrow,
+.guided-card .eyebrow,
+.app .eyebrow {
+  color: var(--ui-ink-faint);
+  letter-spacing: 0.13em;
+}
+
+.landing h1,
+.guided-card h1 {
+  color: var(--ui-ink);
+  font-size: clamp(42px, 4.9vw, 70px);
+  line-height: 0.96;
+  text-wrap: balance;
+}
+
+.landing-copy {
+  max-width: 610px;
+  color: var(--ui-ink-soft);
+  font-size: clamp(17px, 1.65vw, 22px);
+  font-weight: 760;
+}
+
+.landing-button,
+.guided-card .button:not(.landing-button) {
+  min-height: 58px;
+  color: #fffaf5;
+  background: var(--ui-accent);
+  border: 1px solid rgba(255, 70, 16, 0.92);
+  border-radius: 999px;
+  box-shadow: 0 18px 34px rgba(255, 70, 16, 0.18);
+}
+
+.landing-button:not(.ghost) {
+  color: var(--ui-ink);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.58), rgba(255, 255, 255, 0.2)),
+    rgba(255, 255, 255, 0.24);
+  border-color: var(--ui-line-bright);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.92),
+    0 18px 34px rgba(23, 79, 73, 0.08);
+}
+
+.app {
+  display: grid;
+  grid-template-columns: 236px minmax(0, 1fr);
+  gap: 20px;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 18px;
+  background:
+    linear-gradient(180deg, rgba(255, 246, 239, 0.82), rgba(238, 248, 245, 0) 34%),
+    linear-gradient(135deg, #e0f1ee 0%, #f7fbf8 54%, #fff6ef 100%);
+}
+
+.app > main {
+  width: min(1160px, 100%);
+  padding: 14px 10px 48px;
+}
+
+.sidebar {
+  position: sticky;
+  top: 18px;
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 36px);
+  padding: 16px;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.3)),
+    rgba(255, 255, 255, 0.5);
+  border: 1px solid var(--ui-line-bright);
+  border-radius: 28px;
+  box-shadow: var(--ui-shadow-soft);
+  backdrop-filter: blur(28px) saturate(1.25);
+}
+
+.brand {
+  gap: 10px;
+  margin-bottom: 20px;
+  padding: 6px 6px 14px;
+  border-bottom: 1px solid var(--ui-line);
+}
+
+.brand-mark {
+  width: 48px;
+  height: 48px;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
+.brand strong {
+  color: var(--ui-ink);
+  font-size: 26px;
+  line-height: 0.95;
+}
+
+.brand span {
+  color: var(--ui-ink-faint);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.nav {
+  min-height: 48px;
+  margin-bottom: 6px;
+  padding: 0 12px;
+  color: var(--ui-ink-soft);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 18px;
+  box-shadow: none;
+  font-weight: 850;
+}
+
+.nav svg {
+  color: var(--ui-accent);
+}
+
+.nav.active,
+.nav:hover {
+  color: var(--ui-ink);
+  background: var(--ui-surface-strong);
+  border-color: var(--ui-line-bright);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.88), var(--ui-shadow-soft);
+}
+
+.topbar {
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.app h1 {
+  max-width: 680px;
+  color: var(--ui-ink);
+  font-size: clamp(32px, 3.5vw, 50px);
+  line-height: 0.96;
+}
+
+.top-actions {
+  gap: 8px;
+}
+
+.status-pill,
+.button.ghost {
+  min-height: 38px;
+  color: var(--ui-ink);
+  background: var(--ui-surface);
+  border: 1px solid var(--ui-line-bright);
+  border-radius: 999px;
+  box-shadow: none;
+  backdrop-filter: blur(18px);
+}
+
+.button:not(.landing-button),
+.form-actions .button,
+.onboarding-submit {
+  min-height: 42px;
+  color: #fffaf5;
+  background: var(--ui-accent);
+  border: 1px solid rgba(255, 70, 16, 0.9);
+  border-radius: 999px;
+  box-shadow: 0 14px 28px rgba(255, 70, 16, 0.16);
+}
+
+.today-flow,
+.stack,
+.grid,
+.form {
+  gap: 16px;
+}
+
+.panel,
+.metric,
+.journey-step,
+.food-now-card,
+.today-hero,
+.hero-panel,
+.manual-food,
+.logged-food,
+.insight-card,
+.story-card,
+.timeline-item,
+.setup,
+.body-map,
+.list p,
+.library span,
+.inline-list span,
+.reference span {
+  color: var(--ui-ink);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.76), rgba(255, 255, 255, 0.34)),
+    rgba(255, 255, 255, 0.44);
+  border: 1px solid var(--ui-line-bright);
+  border-radius: 24px;
+  box-shadow: var(--ui-shadow-soft);
+  backdrop-filter: blur(24px) saturate(1.18);
+}
+
+.panel {
+  padding: 20px;
+}
+
+.panel h2,
+.manual-food summary {
+  color: var(--ui-ink);
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.panel h2 svg,
+.manual-food summary::marker,
+.food-actions button svg,
+.status-pill svg {
+  color: var(--ui-accent);
+}
+
+.food-now-card {
+  grid-template-columns: minmax(0, 1fr) 180px;
+  min-height: 190px;
+  padding: 26px;
+}
+
+.food-now-card h2,
+.today-hero h2,
+.hero-copy h2 {
+  color: var(--ui-ink);
+  font-size: clamp(34px, 3.8vw, 56px);
+  line-height: 0.98;
+}
+
+.food-now-card p:not(.eyebrow),
+.today-hero p:not(.eyebrow),
+.hero-copy p,
+.insight-card p,
+.story-card p,
+.timeline-item p,
+.empty-note {
+  color: var(--ui-ink-soft);
+}
+
+.meal-suggestion,
+.hero-tags span,
+.journey-number,
+.journey-icon,
+.recovery-grid span,
+.prompt-stack span,
+.heat-list span {
+  color: var(--ui-ink);
+  background: rgba(255, 255, 255, 0.62);
+  border: 1px solid var(--ui-line-bright);
+  border-radius: 18px;
+  box-shadow: none;
+}
+
+.suggested-food-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.suggested-food-grid button,
+.quick-strip button,
+.chips button,
+.mini-card,
+.match-box button,
+.meal-chip,
+.usual-grid button,
+.last-meal,
+.choice-card,
+.onboarding-chip {
+  color: var(--ui-ink);
+  background: rgba(255, 255, 255, 0.68);
+  border: 1px solid var(--ui-line-bright);
+  border-radius: 18px;
+  box-shadow: var(--ui-shadow-soft);
+}
+
+.suggested-food-grid button {
+  min-height: 96px;
+  padding: 18px;
+}
+
+.suggested-food-grid button:nth-child(n),
+.quick-strip button:nth-child(n),
+.chips button:nth-child(n),
+.mini-card:nth-child(n),
+.usual-grid button:nth-child(n) {
+  color: var(--ui-ink);
+  background: rgba(255, 255, 255, 0.68);
+}
+
+.suggested-food-grid button:hover,
+.quick-strip button:hover,
+.chips button:hover,
+.mini-card:hover,
+.match-box button:hover {
+  border-color: rgba(255, 70, 16, 0.36);
+  box-shadow: 0 18px 36px rgba(23, 79, 73, 0.1);
+}
+
+.suggested-food-grid button strong,
+.logged-food strong,
+.metric strong,
+.timeline-item strong,
+.insight-card strong,
+.story-card strong {
+  color: var(--ui-ink);
+}
+
+.suggested-food-grid button small,
+.logged-food small,
+.metric span,
+.metric p,
+small {
+  color: var(--ui-ink-soft);
+}
+
+.manual-food {
+  padding: 16px 18px;
+}
+
+.logged-food {
+  grid-template-columns: minmax(0, 1fr) auto;
+  padding: 14px;
+  box-shadow: none;
+}
+
+.food-actions button,
+.library.editable button {
+  color: var(--ui-accent);
+  background: var(--ui-accent-soft);
+  border: 1px solid rgba(255, 70, 16, 0.18);
+  border-radius: 12px;
+}
+
+input,
+select,
+textarea {
+  color: var(--ui-ink);
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid var(--ui-line-bright);
+  border-radius: 16px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.86);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: rgba(255, 70, 16, 0.56);
+  box-shadow: 0 0 0 4px rgba(255, 70, 16, 0.12);
+}
+
+.metrics {
+  gap: 12px;
+}
+
+.metric {
+  padding: 18px;
+}
+
+.metric::after {
+  height: 3px;
+  background: var(--ui-accent);
+}
+
+.progress {
+  background: rgba(23, 79, 73, 0.1);
+}
+
+.progress span {
+  background: var(--ui-accent);
+}
+
+.hero-panel {
+  min-height: 240px;
+  padding: 28px;
+  overflow: hidden;
+}
+
+.hero-panel::before {
+  content: none;
+}
+
+.readiness-dial {
+  background:
+    radial-gradient(circle at center, rgba(255, 255, 255, 0.86) 0 55%, transparent 56%),
+    conic-gradient(var(--ui-accent) var(--score), rgba(23, 79, 73, 0.11) 0);
+  border-color: var(--ui-line-bright);
+  box-shadow: var(--ui-shadow-soft);
+}
+
+.quick-dock {
+  display: none;
+}
+
+.guided-card .choice-card,
+.guided-card .onboarding-chip,
+.guided-card .single-field input {
+  background: rgba(255, 255, 255, 0.66);
+  border-color: var(--ui-line-bright);
+  box-shadow: var(--ui-shadow-soft);
+}
+
+.guided-card .choice-card.active,
+.guided-card .onboarding-chip.active {
+  color: #fffaf5;
+  background: var(--ui-accent);
+  border-color: var(--ui-accent);
+}
+
+@media (max-width: 1080px) {
+  .app {
+    display: block;
+    padding: 12px 12px 96px;
+  }
+
+  .app > main {
+    padding: 12px 4px 24px;
+  }
+
+  .sidebar {
+    position: fixed;
+    z-index: 20;
+    top: auto;
+    right: max(12px, env(safe-area-inset-right));
+    bottom: max(12px, env(safe-area-inset-bottom));
+    left: max(12px, env(safe-area-inset-left));
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 4px;
+    height: auto;
+    padding: 8px;
+    border-radius: 24px;
+  }
+
+  .brand {
+    display: none;
+  }
+
+  .nav {
+    display: grid;
+    place-items: center;
+    min-height: 52px;
+    margin: 0;
+    padding: 6px 4px;
+    border-radius: 18px;
+    font-size: 11px;
+    line-height: 1.05;
+    text-align: center;
+  }
+
+  .nav svg {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+@media (max-width: 760px) {
+  .topbar {
+    display: grid;
+    gap: 14px;
+  }
+
+  .app h1 {
+    font-size: clamp(30px, 10vw, 44px);
+  }
+
+  .top-actions {
+    justify-content: flex-start;
+  }
+
+  .status-pill,
+  .button.ghost {
+    min-height: 36px;
+    padding: 8px 11px;
+    font-size: 12px;
+  }
+
+  .food-now-card,
+  .hero-panel,
+  .today-hero,
+  .grid.two,
+  .metrics,
+  .journey,
+  .recovery-grid,
+  .suggested-food-grid,
+  .row,
+  .insight-grid,
+  .timeline-item,
+  .logged-food {
+    grid-template-columns: 1fr;
+  }
+
+  .food-now-card,
+  .hero-panel,
+  .panel {
+    padding: 18px;
+    border-radius: 22px;
+  }
+
+  .meal-suggestion.compact {
+    min-height: 0;
+  }
+}
+
+@media (max-width: 520px) {
+  .landing,
+  .onboarding-shell {
+    padding:
+      max(22px, env(safe-area-inset-top))
+      max(18px, env(safe-area-inset-right))
+      max(22px, env(safe-area-inset-bottom))
+      max(18px, env(safe-area-inset-left));
+  }
+
+  .landing-mark {
+    width: 132px;
+    height: 126px;
+  }
+
+  .landing h1,
+  .guided-card h1 {
+    font-size: clamp(38px, 12.5vw, 56px);
+    line-height: 0.98;
+  }
+
+  .landing-copy {
+    font-size: 17px;
+  }
+
+  .landing-button {
+    width: 100%;
+  }
+
+  .sidebar {
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+  }
+
+  .nav span {
+    display: none;
+  }
+
+  .nav {
+    min-height: 48px;
+  }
+}
