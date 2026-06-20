@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">twinge</string>
+    <string name="title_activity_main">twinge</string>
+    <string name="package_name">com.twinge.app</string>
+    <string name="custom_url_scheme">com.twinge.app</string>
+</resources>
