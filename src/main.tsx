@@ -674,17 +674,6 @@ function FoodPage({ data, setData, totals }: { data: AppData; setData: React.Dis
   return (
     <section className="grid two">
       <Panel title="Smart food log" icon={<Apple size={18} />}>
-        {!data.profile.foodSetupDone && (
-          <div className="setup">
-            <p>Pick usual foods to seed your personal library.</p>
-            <div className="chips">
-              {starterFoods.map((food) => (
-                <button key={food} onClick={() => !data.foodLibrary.some((item) => item.name === food) && setData((current) => ({ ...current, foodLibrary: [...current.foodLibrary, { id: uid("food"), name: food, calories: 0, protein: 0, fiber: 0, timesLogged: 0 }] }))}>{food}</button>
-              ))}
-            </div>
-            <button className="button" onClick={() => setData((current) => ({ ...current, profile: { ...current.profile, foodSetupDone: true } }))}>Done</button>
-          </div>
-        )}
         <form className="form" onSubmit={submitManual}>
           <label>Meal<select value={meal} onChange={(event) => setMeal(event.target.value as MealTag)}>{meals.map((item) => <option key={item}>{item}</option>)}</select></label>
           <label>After-meal feel<select value={feeling} onChange={(event) => setFeeling(event.target.value as MealFeeling)}>{mealFeelings.map((item) => <option key={item}>{item}</option>)}</select></label>
