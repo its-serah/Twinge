@@ -1,5 +1,13 @@
-const CACHE_NAME = "twinge-v1";
-const APP_SHELL = ["/", "/manifest.webmanifest"];
+const CACHE_NAME = "twinge-v2";
+const APP_SHELL = [
+  "/",
+  "/manifest.webmanifest",
+  "/LOGOTWINGE-transparent.png",
+  "/slider-icon.png",
+  "/app-icon-180.png",
+  "/app-icon-192.png",
+  "/app-icon-512.png",
+];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL)));
@@ -15,5 +23,23 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
-  event.respondWith(fetch(event.request).catch(() => caches.match(event.request).then((cached) => cached || caches.match("/"))));
+  const requestUrl = new URL(event.request.url);
+
+  if (event.request.mode === "navigate") {
+    event.respondWith(fetch(event.request).catch(() => caches.match("/")));
+    return;
+  }
+
+  if (requestUrl.origin !== self.location.origin) return;
+
+  event.respondWith(
+    caches.match(event.request).then((cached) => {
+      if (cached) return cached;
+      return fetch(event.request).then((response) => {
+        const copy = response.clone();
+        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+        return response;
+      });
+    })
+  );
 });

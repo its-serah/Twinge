@@ -157,7 +157,10 @@ const fontOptions = [
 
 function App() {
   const [data, setData] = useState<AppData>(() => loadData());
-  const [active, setActive] = useState("Today");
+  const [active, setActive] = useState(() => {
+    const tab = new URLSearchParams(window.location.search).get("tab");
+    return tab && navItems.includes(tab) ? tab : "Today";
+  });
   const [stage, setStage] = useState<"landing" | "onboarding" | "app">("landing");
 
   useEffect(() => saveData(data), [data]);

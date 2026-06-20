@@ -2,9 +2,46 @@
   "name": "twinge.",
   "short_name": "twinge",
   "description": "feel it. track it. understand it.",
-  "start_url": "/",
+  "id": "/",
+  "start_url": "/?source=pwa",
+  "scope": "/",
   "display": "standalone",
+  "orientation": "portrait-primary",
   "background_color": "#d4eae8",
   "theme_color": "#d4eae8",
-  "icons": []
+  "categories": ["health", "lifestyle", "productivity"],
+  "icons": [
+    {
+      "src": "/app-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/app-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/app-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Log food",
+      "short_name": "Food",
+      "url": "/?tab=Food",
+      "icons": [{ "src": "/app-icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Daily check-in",
+      "short_name": "Check-in",
+      "url": "/?tab=Check-in",
+      "icons": [{ "src": "/app-icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    }
+  ]
 }

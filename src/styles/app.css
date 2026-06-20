@@ -24,15 +24,30 @@
   box-sizing: border-box;
 }
 
+html {
+  min-height: 100%;
+  background: #d4eae8;
+  overscroll-behavior: none;
+}
+
 body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  min-height: 100dvh;
   background:
     radial-gradient(circle at 12% 12%, rgba(212, 234, 232, 0.95), transparent 28%),
     radial-gradient(circle at 82% 8%, rgba(255, 70, 16, 0.9), transparent 24%),
     radial-gradient(circle at 75% 78%, rgba(255, 70, 16, 0.92), transparent 30%),
     linear-gradient(135deg, #d4eae8, #d4eae8 48%, #d4eae8);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
+}
+
+#root {
+  min-height: 100vh;
+  min-height: 100dvh;
 }
 
 button,
@@ -3108,5 +3123,55 @@ textarea {
   .metric,
   .journey-step {
     padding: 15px;
+  }
+}
+
+@media (display-mode: standalone) {
+  body {
+    user-select: none;
+  }
+
+  input,
+  textarea {
+    user-select: text;
+  }
+
+  .landing,
+  .onboarding-shell,
+  .app {
+    min-height: 100dvh;
+  }
+}
+
+@media (max-width: 1080px) {
+  .app {
+    padding:
+      max(12px, env(safe-area-inset-top))
+      max(12px, env(safe-area-inset-right))
+      max(12px, env(safe-area-inset-bottom))
+      max(12px, env(safe-area-inset-left));
+  }
+
+  .sidebar {
+    right: max(12px, env(safe-area-inset-right));
+    bottom: max(12px, env(safe-area-inset-bottom));
+    left: max(12px, env(safe-area-inset-left));
+  }
+}
+
+@media (max-width: 620px) {
+  .landing,
+  .onboarding-shell {
+    padding:
+      max(26px, env(safe-area-inset-top))
+      max(18px, env(safe-area-inset-right))
+      max(26px, env(safe-area-inset-bottom))
+      max(18px, env(safe-area-inset-left));
+  }
+
+  input,
+  select,
+  textarea {
+    font-size: 16px;
   }
 }
