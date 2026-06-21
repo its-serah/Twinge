@@ -164,6 +164,9 @@ function App() {
   const [stage, setStage] = useState<"landing" | "onboarding" | "app">("landing");
 
   useEffect(() => saveData(data), [data]);
+  useEffect(() => {
+    if (stage === "app") window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [active, stage]);
 
   const today = todayKey();
   const todayFoods = data.foodLogs.filter((log) => log.loggedAt.startsWith(today));
@@ -278,14 +281,35 @@ function LandingPage({ onEnter }: { onEnter: () => void }) {
   return (
     <main className="landing">
       <section className="landing-card">
-        <div className="landing-mark"><img src="/LOGOTWINGE-transparent.png" alt="Twinge logo" /></div>
-        <p className="eyebrow">feel it. track it. understand it.</p>
-        <h1>Tune into what your body is saying.</h1>
-        <p className="landing-copy">Log meals, movement, mood, and symptoms so your daily patterns start making sense.</p>
-        <div className="landing-actions">
-          <button className="button landing-button start-button" onClick={onEnter}>
-            Start tracking <ArrowRight size={18} />
-          </button>
+        <div className="landing-content">
+          <div className="landing-mark"><img src="/LOGOTWINGE-transparent.png" alt="Twinge logo" /></div>
+          <p className="eyebrow">feel it. track it. understand it.</p>
+          <h1>Your body log, without the noise.</h1>
+          <p className="landing-copy">Food, water, symptoms, workouts, mood, and sleep in one fast daily check-in.</p>
+          <div className="landing-actions">
+            <button className="button landing-button start-button" onClick={onEnter}>
+              Start tracking <ArrowRight size={18} />
+            </button>
+          </div>
+        </div>
+        <div className="landing-preview" aria-hidden="true">
+          <div className="preview-header">
+            <span>Today</span>
+            <strong>72%</strong>
+          </div>
+          <div className="preview-ring">
+            <Activity size={36} />
+          </div>
+          <div className="preview-stats">
+            <span><Flame size={16} /> 650 kcal</span>
+            <span><Droplets size={16} /> 3 glasses</span>
+            <span><HeartPulse size={16} /> 1 symptom</span>
+          </div>
+          <div className="preview-log">
+            <span>12:40</span>
+            <strong>Lunch: chicken rice bowl</strong>
+            <small>Felt good</small>
+          </div>
         </div>
       </section>
     </main>
