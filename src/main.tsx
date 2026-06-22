@@ -288,7 +288,7 @@ function LandingPage({ onEnter }: { onEnter: () => void }) {
           <p className="landing-copy">Food, water, symptoms, workouts, mood, and sleep in one fast daily check-in.</p>
           <div className="landing-actions">
             <button className="button landing-button start-button" onClick={onEnter}>
-              Start tracking <ArrowRight size={18} />
+              Open Twinge
             </button>
           </div>
         </div>

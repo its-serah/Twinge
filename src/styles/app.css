@@ -204,10 +204,21 @@ small {
 }
 
 .landing-button {
-  min-width: 190px;
-  min-height: 54px;
-  padding-inline: 22px;
-  font-size: 17px;
+  min-width: 156px;
+  min-height: 50px;
+  padding-inline: 20px;
+  color: #ffffff;
+  background: var(--ink);
+  border-color: var(--ink);
+  border-radius: 999px;
+  box-shadow: 0 8px 18px rgba(11, 36, 36, 0.14);
+  font-size: 16px;
+}
+
+.landing-button:hover {
+  background: #123b39;
+  border-color: #123b39;
+  box-shadow: 0 10px 22px rgba(11, 36, 36, 0.18);
 }
 
 .landing-preview {
