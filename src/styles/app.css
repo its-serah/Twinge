@@ -167,6 +167,11 @@ small {
   gap: 10px;
 }
 
+.landing .landing-actions {
+  max-width: 520px;
+  justify-content: flex-end;
+}
+
 .button {
   display: inline-flex;
   align-items: center;
@@ -1258,6 +1263,11 @@ textarea {
 @media (max-width: 520px) {
   .landing-button {
     width: 100%;
+  }
+
+  .landing .landing-actions {
+    max-width: none;
+    justify-content: stretch;
   }
 
   .landing-mark {
