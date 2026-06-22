@@ -169,7 +169,8 @@ small {
 
 .landing .landing-actions {
   max-width: 520px;
-  justify-content: center;
+  justify-content: flex-start;
+  margin-top: -2px;
 }
 
 .button {
