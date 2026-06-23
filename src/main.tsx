@@ -243,8 +243,12 @@ function App() {
             <h1>{active === "Today" ? `Hey ${data.profile.name || "Sarah"}, what are we eating?` : active === "Dashboard" ? "Pick what to log." : active}</h1>
           </div>
           <div className="top-actions">
-            <span className="status-pill"><Flame size={15} /> {totals.calories}/{data.profile.calorieGoal}</span>
-            <span className="status-pill"><Droplets size={15} /> {waterGlasses}/{data.profile.waterGoal}</span>
+            {active !== "Today" && (
+              <>
+                <span className="status-pill"><Flame size={15} /> {totals.calories}/{data.profile.calorieGoal}</span>
+                <span className="status-pill"><Droplets size={15} /> {waterGlasses}/{data.profile.waterGoal}</span>
+              </>
+            )}
             {active === "Today" && (
               <button className="top-link" onClick={() => setActive("Dashboard")} aria-label="Open dashboard">
                 <BarChart3 size={17} />
