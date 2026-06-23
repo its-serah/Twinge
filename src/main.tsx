@@ -14,7 +14,6 @@ import {
   Download,
   Flame,
   HeartPulse,
-  Pencil,
   Plus,
   Settings,
   Footprints,
@@ -210,7 +209,7 @@ function App() {
 
   if (stage === "landing") {
     return <LandingPage onEnter={() => {
-      setActive("Dashboard");
+      setActive("Today");
       setStage("app");
     }} />;
   }
@@ -220,7 +219,7 @@ function App() {
   }
 
   return (
-    <div className="app">
+    <div className={active === "Today" ? "app today-home" : "app"}>
       <aside className="sidebar">
         <div className="brand">
           <div className="brand-mark"><img src="/LOGOTWINGE-transparent.png" alt="Twinge logo" /></div>
@@ -492,8 +491,10 @@ function OnboardingPage({ data, setData, onDone }: { data: AppData; setData: Rea
   );
 }
 
-function TodayPage({ data, setData }: { data: AppData; setData: React.Dispatch<React.SetStateAction<AppData>>; setActive: (tab: string) => void }) {
+function TodayPage({ data, setData, setActive }: { data: AppData; setData: React.Dispatch<React.SetStateAction<AppData>>; setActive: (tab: string) => void }) {
   const meal = mealForNow();
+  const hour = new Date().getHours();
+  const isWorkoutTime = hour >= 16 && hour < 20;
   const todayFoodLogs = data.foodLogs.filter((log) => log.loggedAt.startsWith(todayKey())).slice().reverse();
   const [query, setQuery] = useState("");
   const [manual, setManual] = useState({ calories: 0, protein: 0, fiber: 0 });
@@ -560,63 +561,32 @@ function TodayPage({ data, setData }: { data: AppData; setData: React.Dispatch<R
       <article className="food-now-card">
         <div>
           <p className="eyebrow">{new Date().toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" })}</p>
-          <h2>Looks like {meal.toLowerCase()}.</h2>
+          <h2>{isWorkoutTime ? "Workout or dinner time." : `Looks like ${meal.toLowerCase()}.`}</h2>
           <p>Select what you usually eat around now. If it is not here, add it manually.</p>
         </div>
         <div className="meal-suggestion compact">
-          <Clock size={18} />
-          <span>Auto-selected</span>
-          <strong>{meal}</strong>
+          {isWorkoutTime ? <Dumbbell size={18} /> : <Clock size={18} />}
+          <span>{isWorkoutTime ? "Suggested now" : "Auto-selected"}</span>
+          <strong>{isWorkoutTime ? "Gym" : meal}</strong>
         </div>
       </article>
 
+      <section className="today-intent">
+        <div className="today-route-actions">
+          <button className="button" onClick={() => setActive(isWorkoutTime ? "Gym" : "Food")}>
+            {isWorkoutTime ? <Dumbbell size={17} /> : <Apple size={17} />}
+            {isWorkoutTime ? "Log workout" : "Log food"}
+          </button>
+          <button className="button ghost" onClick={() => setActive(isWorkoutTime ? "Food" : "Gym")}>
+            {isWorkoutTime ? "Food" : "Gym"}
+          </button>
+          <button className="button ghost" onClick={() => setActive("Check-in")}>Check-in</button>
+          <button className="button ghost" onClick={() => setActive("Symptoms")}>Symptoms</button>
+          <button className="button ghost" onClick={() => setActive("Dashboard")}>Dashboard</button>
+        </div>
+      </section>
+
       {confirmation && <div className="added-toast"><CheckCircle2 size={18} /> {confirmation}</div>}
-
-      <Panel title={`Suggested for ${meal}`} icon={<Sparkles size={18} />}>
-        <div className="suggested-food-grid">
-          {suggestedFoods.length ? suggestedFoods.map((food) => (
-            <button key={food.id} onClick={() => logFood(food)}>
-              <strong>{food.name}</strong>
-              <small>{food.calories} kcal · {food.protein}g protein</small>
-            </button>
-          )) : <p className="empty-note">No usual foods for this time yet. Add one below and Twinge will remember it.</p>}
-        </div>
-      </Panel>
-
-      <details className="manual-food" open={suggestedFoods.length === 0 || Boolean(editingId)}>
-        <summary>{editingId ? "Edit food" : "Add something else"}</summary>
-        <form className="form" onSubmit={submitManual}>
-          <label>Food name<input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Type what you ate" /></label>
-          <label>How did it feel?<select value={feeling} onChange={(event) => setFeeling(event.target.value as MealFeeling)}>{mealFeelings.map((item) => <option key={item}>{item}</option>)}</select></label>
-          {matches.length > 0 && <div className="match-box">{matches.slice(0, 5).map((food) => <button type="button" key={food.id} onClick={() => logFood(food)}>Use {food.name} · {food.calories} kcal</button>)}</div>}
-          <div className="row">
-            <label>Calories<input type="number" value={manual.calories} onChange={(event) => setManual({ ...manual, calories: Number(event.target.value) })} /></label>
-            <label>Protein<input type="number" value={manual.protein} onChange={(event) => setManual({ ...manual, protein: Number(event.target.value) })} /></label>
-            <label>Fiber<input type="number" value={manual.fiber} onChange={(event) => setManual({ ...manual, fiber: Number(event.target.value) })} /></label>
-          </div>
-          <div className="form-actions">
-            <button className="button"><Plus size={17} /> {editingId ? "Save" : `Add to ${meal}`}</button>
-            {editingId && <button type="button" className="button ghost" onClick={clearForm}>Cancel</button>}
-          </div>
-        </form>
-      </details>
-
-      <Panel title="Logged today" icon={<Apple size={18} />}>
-        <div className="today-food-list">
-          {todayFoodLogs.length ? todayFoodLogs.map((log) => (
-            <article key={log.id} className="logged-food">
-              <div>
-                <strong>{log.name}</strong>
-                <small>{log.mealTag} · {log.calories} kcal · {log.protein}g protein · {log.fiber}g fiber{log.feeling ? ` · ${log.feeling}` : ""}</small>
-              </div>
-              <div className="food-actions">
-                <button aria-label={`Edit ${log.name}`} onClick={() => editFoodLog(log)}><Pencil size={16} /></button>
-                <button aria-label={`Delete ${log.name}`} onClick={() => deleteFoodLog(log.id)}><Trash2 size={16} /></button>
-              </div>
-            </article>
-          )) : <p className="empty-note">Nothing logged yet today.</p>}
-        </div>
-      </Panel>
     </section>
   );
 }

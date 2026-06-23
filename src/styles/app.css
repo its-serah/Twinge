@@ -336,6 +336,19 @@ small {
   padding: 20px 24px 28px;
 }
 
+.app.today-home {
+  display: block;
+  padding-inline: clamp(18px, 10vw, 160px);
+}
+
+.today-home .sidebar {
+  display: none;
+}
+
+.today-home > main {
+  width: min(980px, 100%);
+}
+
 .sidebar {
   position: sticky;
   top: 20px;
@@ -666,6 +679,40 @@ small {
   color: var(--muted);
   font-size: 15px;
   font-weight: 720;
+}
+
+.today-intent {
+  display: grid;
+  gap: 16px;
+  max-width: 760px;
+}
+
+.today-route-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+}
+
+.today-route-actions .button:first-child {
+  margin-right: 8px;
+}
+
+.today-route-actions .button.ghost {
+  min-height: 34px;
+  padding: 4px 0;
+  color: var(--muted);
+  background: transparent;
+  border-color: transparent;
+  border-radius: 0;
+  box-shadow: none;
+  font-size: 15px;
+}
+
+.today-route-actions .button.ghost:hover {
+  color: var(--ink);
+  background: transparent;
+  border-color: transparent;
 }
 
 .meal-suggestion {
