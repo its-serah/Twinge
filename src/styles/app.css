@@ -722,48 +722,56 @@ small {
 }
 
 .food-suggestion-card {
+  position: relative;
   display: grid;
-  grid-template-columns: 82px minmax(0, 1fr);
-  align-items: center;
-  gap: 12px;
-  min-width: min(360px, 100%);
-  min-height: 86px;
-  padding: 8px 14px 8px 8px;
+  grid-template-columns: 116px minmax(0, 1fr);
+  align-items: stretch;
+  gap: 0;
+  width: min(430px, 100%);
+  min-height: 112px;
+  overflow: hidden;
+  padding: 0;
   color: var(--ink);
-  background: rgba(255, 255, 255, 0.78);
+  background: rgba(255, 255, 255, 0.86);
   border: 1px solid var(--line);
-  border-radius: 18px;
+  border-radius: 24px;
   text-align: left;
-  box-shadow: 0 10px 26px rgba(24, 47, 45, 0.08);
+  box-shadow: 0 14px 34px rgba(24, 47, 45, 0.1);
 }
 
 .food-thumb {
   position: relative;
   display: block;
-  width: 76px;
-  height: 70px;
+  width: 116px;
+  height: 100%;
   overflow: hidden;
   background:
-    radial-gradient(circle at 54% 56%, #f6f1df 0 18%, transparent 19%),
-    radial-gradient(circle at 42% 45%, #d97842 0 12%, transparent 13%),
-    radial-gradient(circle at 66% 42%, #6aa56f 0 8%, transparent 9%),
-    radial-gradient(circle at 36% 68%, #efb45b 0 10%, transparent 11%),
-    linear-gradient(135deg, #fff0df, #f8c9a7);
-  border-radius: 15px;
+    radial-gradient(circle at 56% 52%, rgba(246, 241, 223, 0.9) 0 17%, transparent 18%),
+    radial-gradient(circle at 42% 45%, #d97842 0 13%, transparent 14%),
+    radial-gradient(circle at 68% 42%, #6aa56f 0 9%, transparent 10%),
+    radial-gradient(circle at 37% 70%, #efb45b 0 11%, transparent 12%),
+    linear-gradient(135deg, #ffe4cc, #f4b680 48%, #e99f68);
+  border-radius: 0;
 }
 
 .food-thumb::after {
   content: "";
   position: absolute;
-  inset: 13px;
-  border: 7px solid rgba(255, 255, 255, 0.92);
+  left: 23px;
+  top: 22px;
+  width: 68px;
+  height: 68px;
+  border: 9px solid rgba(255, 255, 255, 0.92);
   border-radius: 50%;
   box-shadow: 0 8px 18px rgba(56, 31, 20, 0.14);
 }
 
 .food-thumb .bowl {
   position: absolute;
-  inset: 18px;
+  left: 36px;
+  top: 35px;
+  width: 44px;
+  height: 44px;
   z-index: 1;
   background:
     radial-gradient(circle at 40% 42%, #fffaf0 0 16%, transparent 17%),
@@ -773,10 +781,22 @@ small {
   border-radius: 50%;
 }
 
+.food-card-copy {
+  display: grid;
+  align-content: center;
+  gap: 6px;
+  padding: 18px 18px 18px 16px;
+}
+
 .food-suggestion-card small {
-  display: block;
-  margin-bottom: 3px;
+  display: inline-flex;
+  width: fit-content;
+  margin-bottom: 0;
+  padding: 5px 8px;
   color: var(--accent-2);
+  background: #e8f7f3;
+  border: 1px solid #c7e9e0;
+  border-radius: 999px;
   font-size: 11px;
   font-weight: 900;
   text-transform: uppercase;
@@ -785,8 +805,8 @@ small {
 .food-suggestion-card strong {
   display: block;
   overflow-wrap: anywhere;
-  font-size: 18px;
-  line-height: 1.05;
+  font-size: 22px;
+  line-height: 1;
 }
 
 .food-suggestion-card:hover {
@@ -800,12 +820,14 @@ small {
   align-items: center;
   align-self: center;
   gap: 7px;
-  min-height: 42px;
-  padding: 9px 13px;
-  color: var(--muted);
+  min-height: 30px;
+  margin-top: 12px;
+  padding: 0;
+  color: rgba(255, 255, 255, 0.74);
   background: transparent;
   border: 1px solid transparent;
   border-radius: 999px;
+  font-size: 12px;
   font-weight: 850;
 }
 
@@ -814,9 +836,9 @@ small {
 }
 
 .different-food-chip:hover {
-  color: var(--ink);
-  background: rgba(255, 255, 255, 0.64);
-  border-color: var(--line);
+  color: #fff;
+  background: transparent;
+  border-color: transparent;
 }
 
 .today-intent {

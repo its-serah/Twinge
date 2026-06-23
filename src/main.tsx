@@ -593,14 +593,10 @@ function TodayPage({ data, setData, setActive }: { data: AppData; setData: React
               setActive(isWorkoutTime ? "Gym" : "Food");
             }}>
               <span className="food-thumb" aria-hidden="true"><span className="bowl" /></span>
-              <span>
+              <span className="food-card-copy">
                 <small>{isWorkoutTime ? "Suggested" : "Usual pick"}</small>
                 <strong>{primaryLabel.replace(/^Log\s/, "")}</strong>
               </span>
-            </button>
-            <button className="different-food-chip" onClick={() => setActive("Food")}>
-              <Plus size={16} />
-              <strong>{isWorkoutTime ? "Log food instead" : usualFood ? "Different food" : "Something else"}</strong>
             </button>
           </div>
         </div>
@@ -608,6 +604,10 @@ function TodayPage({ data, setData, setActive }: { data: AppData; setData: React
           {isWorkoutTime ? <Dumbbell size={18} /> : <Clock size={18} />}
           <span>{isWorkoutTime ? "Suggested now" : "Smart suggestion"}</span>
           <strong>{isWorkoutTime ? "Gym" : meal}</strong>
+          <button className="different-food-chip" onClick={() => setActive("Food")}>
+            <Plus size={15} />
+            <strong>{isWorkoutTime ? "Food instead" : usualFood ? "Different food" : "Something else"}</strong>
+          </button>
         </div>
       </article>
 
