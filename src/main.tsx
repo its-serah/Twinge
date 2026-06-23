@@ -584,19 +584,20 @@ function TodayPage({ data, setData, setActive }: { data: AppData; setData: React
           <h2>{isWorkoutTime ? "Evening window" : `${meal} window`}</h2>
           <p>{promptTitle}</p>
           <small className="now-copy">{promptCopy}</small>
-          <div className="now-actions">
-            <button className="button" onClick={() => {
+          <div className="now-actions" role="group" aria-label="Now actions">
+            <button className="now-choice primary" onClick={() => {
               if (usualFood && !isWorkoutTime) {
                 logFood(usualFood);
                 return;
               }
               setActive(isWorkoutTime ? "Gym" : "Food");
             }}>
-              {isWorkoutTime ? <Dumbbell size={17} /> : <Apple size={17} />}
-              {primaryLabel}
+              <span>{isWorkoutTime ? <Dumbbell size={18} /> : <Apple size={18} />}</span>
+              <strong>{primaryLabel}</strong>
             </button>
-            <button className="button ghost" onClick={() => setActive("Food")}>
-              {isWorkoutTime ? "Log food instead" : usualFood ? "Different food" : "Something else"}
+            <button className="now-choice" onClick={() => setActive("Food")}>
+              <span><Plus size={18} /></span>
+              <strong>{isWorkoutTime ? "Log food instead" : usualFood ? "Different food" : "Something else"}</strong>
             </button>
           </div>
         </div>
