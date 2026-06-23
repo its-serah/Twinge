@@ -507,6 +507,14 @@ function TodayPage({ data, setData, setActive }: { data: AppData; setData: React
   const meal = mealForNow();
   const hour = new Date().getHours();
   const isWorkoutTime = hour >= 16 && hour < 20;
+  const usualFood = mealSuggestions(data, meal)[0];
+  const primaryLabel = isWorkoutTime ? "Log workout" : usualFood ? `Log ${usualFood.name}` : `Log ${meal.toLowerCase()}`;
+  const promptTitle = isWorkoutTime ? "Training now?" : usualFood ? `${usualFood.name} again?` : `What happened around ${meal.toLowerCase()}?`;
+  const promptCopy = isWorkoutTime
+    ? "If you trained, log the session. If not, switch to dinner or another note."
+    : usualFood
+      ? `You often log this around ${meal.toLowerCase()}. One tap adds it.`
+      : "Start with food, or jump to another kind of log if this is not a meal moment.";
   const todayFoodLogs = data.foodLogs.filter((log) => log.loggedAt.startsWith(todayKey())).slice().reverse();
   const [query, setQuery] = useState("");
   const [manual, setManual] = useState({ calories: 0, protein: 0, fiber: 0 });
@@ -572,23 +580,36 @@ function TodayPage({ data, setData, setActive }: { data: AppData; setData: React
     <section className="today-flow simple-food-flow">
       <article className="food-now-card">
         <div>
-          <p className="eyebrow">{new Date().toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" })}</p>
-          <h2>{isWorkoutTime ? "Workout or dinner time." : `Looks like ${meal.toLowerCase()}.`}</h2>
-          <p>Select what you usually eat around now. If it is not here, add it manually.</p>
+          <p className="eyebrow">Now · {new Date().toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" })}</p>
+          <h2>{isWorkoutTime ? "Evening window" : `${meal} window`}</h2>
+          <p>{promptTitle}</p>
+          <small className="now-copy">{promptCopy}</small>
+          <div className="now-actions">
+            <button className="button" onClick={() => {
+              if (usualFood && !isWorkoutTime) {
+                logFood(usualFood);
+                return;
+              }
+              setActive(isWorkoutTime ? "Gym" : "Food");
+            }}>
+              {isWorkoutTime ? <Dumbbell size={17} /> : <Apple size={17} />}
+              {primaryLabel}
+            </button>
+            <button className="button ghost" onClick={() => setActive("Food")}>
+              {isWorkoutTime ? "Log food instead" : usualFood ? "Different food" : "Something else"}
+            </button>
+          </div>
         </div>
         <div className="meal-suggestion compact">
           {isWorkoutTime ? <Dumbbell size={18} /> : <Clock size={18} />}
-          <span>{isWorkoutTime ? "Suggested now" : "Auto-selected"}</span>
+          <span>{isWorkoutTime ? "Suggested now" : "Smart suggestion"}</span>
           <strong>{isWorkoutTime ? "Gym" : meal}</strong>
         </div>
       </article>
 
       <section className="today-intent">
+        <p className="eyebrow">Later today</p>
         <div className="today-route-actions">
-          <button className="button" onClick={() => setActive(isWorkoutTime ? "Gym" : "Food")}>
-            {isWorkoutTime ? <Dumbbell size={17} /> : <Apple size={17} />}
-            {isWorkoutTime ? "Log workout" : "Log food"}
-          </button>
           <button className="button ghost" onClick={() => setActive(isWorkoutTime ? "Food" : "Gym")}>
             {isWorkoutTime ? "Food" : "Gym"}
           </button>

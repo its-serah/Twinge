@@ -677,10 +677,10 @@ small {
 
 .food-now-card {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 150px;
-  gap: 16px;
+  grid-template-columns: minmax(0, 1fr) 170px;
+  gap: 22px;
   align-items: center;
-  padding: 20px;
+  padding: 22px 28px;
   background:
     linear-gradient(135deg, rgba(255, 75, 31, 0.1), transparent 45%),
     var(--surface);
@@ -696,27 +696,46 @@ small {
 
 .food-now-card p:not(.eyebrow) {
   max-width: 560px;
-  margin-bottom: 0;
+  margin-bottom: 6px;
+  color: var(--muted);
+  font-size: 20px;
+  font-weight: 720;
+}
+
+.now-copy {
+  display: block;
+  max-width: 540px;
+  margin-bottom: 18px;
   color: var(--muted);
   font-size: 15px;
-  font-weight: 720;
+  font-weight: 760;
+  line-height: 1.35;
+}
+
+.now-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.now-actions .button.ghost {
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.82);
+  border-color: var(--line);
 }
 
 .today-intent {
   display: grid;
-  gap: 16px;
+  gap: 6px;
   max-width: 760px;
+  padding-left: 2px;
 }
 
 .today-route-actions {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 10px 14px;
-}
-
-.today-route-actions .button:first-child {
-  margin-right: 8px;
+  gap: 14px;
 }
 
 .today-route-actions .button.ghost {
