@@ -465,6 +465,27 @@ small {
   font-weight: 850;
 }
 
+.top-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 4px 2px;
+  color: var(--muted);
+  background: transparent;
+  border: 0;
+  font-size: 13px;
+  font-weight: 850;
+}
+
+.top-link svg {
+  color: var(--accent-2);
+}
+
+.top-link:hover {
+  color: var(--ink);
+}
+
 .grid,
 .stack,
 .form,

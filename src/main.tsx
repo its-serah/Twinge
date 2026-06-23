@@ -245,9 +245,17 @@ function App() {
           <div className="top-actions">
             <span className="status-pill"><Flame size={15} /> {totals.calories}/{data.profile.calorieGoal}</span>
             <span className="status-pill"><Droplets size={15} /> {waterGlasses}/{data.profile.waterGoal}</span>
-            <button className="button ghost" onClick={() => exportJson(data)}>
-              <Download size={17} /> Export
-            </button>
+            {active === "Today" && (
+              <button className="top-link" onClick={() => setActive("Dashboard")} aria-label="Open dashboard">
+                <BarChart3 size={17} />
+                <span>Dashboard</span>
+              </button>
+            )}
+            {active === "Dashboard" && (
+              <button className="button ghost" onClick={() => exportJson(data)}>
+                <Download size={17} /> Export
+              </button>
+            )}
           </div>
         </header>
 
