@@ -594,7 +594,6 @@ function TodayPage({ data, setData, setActive }: { data: AppData; setData: React
           </button>
           <button className="button ghost" onClick={() => setActive("Check-in")}>Check-in</button>
           <button className="button ghost" onClick={() => setActive("Symptoms")}>Symptoms</button>
-          <button className="button ghost" onClick={() => setActive("Dashboard")}>Dashboard</button>
         </div>
       </section>
 
